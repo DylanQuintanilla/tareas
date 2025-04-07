@@ -1,0 +1,13 @@
+{
+    "require": {
+        "react/http": "^1.9",
+        "react/mysql": "^0.6",
+        "react/event-loop": "^1.4",
+        "react/socket": "^1.12"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
