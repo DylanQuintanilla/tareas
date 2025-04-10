@@ -11,5 +11,4 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 public class TipoContratacionResponse {
     private String tipoContratacion;
-    private String descripcion;
 }

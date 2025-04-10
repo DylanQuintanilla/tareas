@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import sv.edu.udb.controller.request.EmpleadoRequest;
 import sv.edu.udb.controller.response.EmpleadoResponse;
 import sv.edu.udb.domain.Empleado;
+
 import java.util.List;
 
 @Mapper(componentModel = "spring")
