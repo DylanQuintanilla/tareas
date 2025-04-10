@@ -5,5 +5,6 @@ import org.springframework.stereotype.Repository;
 import sv.edu.udb.domain.Empleado;
 
 @Repository
-public interface EmpleadoRepository extends JpaRepository<Empleado, Integer> {
+public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
+
 }

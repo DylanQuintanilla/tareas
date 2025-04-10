@@ -14,7 +14,7 @@ public class Cargo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //Probar con SEQUENCY
     @Column(name = "idCargo", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "cargo", length = 50)
     private String cargo;

@@ -10,4 +10,5 @@ public interface ContratacionService {
     ContratacionResponse saveContratacion(final ContratacionRequest contratacionRequest);
     ContratacionResponse updateContratacion(final Long id, final ContratacionRequest contratacionRequest);
     void deleteContratacion(final Long id);
+
 }

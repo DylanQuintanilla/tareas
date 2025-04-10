@@ -16,7 +16,7 @@ public class Empleado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idEmpleado", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "numeroDUI", length = 9)
     private String numeroDUI;

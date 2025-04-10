@@ -4,6 +4,7 @@ import sv.edu.udb.controller.request.CargoRequest;
 import sv.edu.udb.controller.response.CargoResponse;
 import java.util.List;
 
+
 public interface CargoService {
     List<CargoResponse> findAllCargos();
     CargoResponse findCargoById(final Long id);

@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import sv.edu.udb.domain.Departamento;
 
 @Repository
-public interface DepartamentoRepository extends JpaRepository<Departamento, Integer> {
+public interface DepartamentoRepository extends JpaRepository<Departamento, Long> {
 }

@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import sv.edu.udb.domain.Tipocontratacion;
 
 @Repository
-public interface TipoContratacionRepository extends JpaRepository <Tipocontratacion, Integer> {
+public interface TipoContratacionRepository extends JpaRepository <Tipocontratacion, Long> {
 }
