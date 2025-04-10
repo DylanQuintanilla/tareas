@@ -10,5 +10,6 @@ import lombok.experimental.FieldNameConstants;
 @Builder(toBuilder = true)
 @FieldNameConstants
 public class TipoContratacionResponse {
+    private Long idTipoContratacion; // Agregado para incluir el ID en la respuesta
     private String tipoContratacion;
 }

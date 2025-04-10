@@ -10,6 +10,7 @@ import lombok.experimental.FieldNameConstants;
 @Builder(toBuilder = true)
 @FieldNameConstants
 public class DepartamentoResponse {
+    private Long idDepartamento; // Agregado para incluir el ID en la respuesta
     private String nombreDepartamento;
     private String descripcionDepartamento;
 }

@@ -1,16 +1,12 @@
 package sv.edu.udb.controller.response;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
-import sv.edu.udb.domain.Cargo;
-import sv.edu.udb.domain.Departamento;
-import sv.edu.udb.domain.Empleado;
-import sv.edu.udb.domain.Tipocontratacion;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Getter
 @Setter

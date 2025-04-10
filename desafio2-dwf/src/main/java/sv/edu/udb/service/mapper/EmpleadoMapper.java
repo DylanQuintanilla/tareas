@@ -11,7 +11,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface EmpleadoMapper {
     @Mapping(source = "id", target = "idEmpleado") // Mapea el ID de la entidad al campo idEmpleado
-    EmpleadoResponse toEmpleadoResponse(Empleado data);
+    EmpleadoResponse toEmpleadoResponse(Empleado data); // Elimina el mapeo de "contrataciones"
     List<EmpleadoResponse> toEmpleadoResponseList(List<Empleado> empleados);
     Empleado toEmpleado(EmpleadoRequest request);
 }

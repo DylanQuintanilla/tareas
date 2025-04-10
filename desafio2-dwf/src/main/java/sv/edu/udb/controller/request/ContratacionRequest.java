@@ -1,20 +1,17 @@
 package sv.edu.udb.controller.request;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import sv.edu.udb.domain.Cargo;
-import sv.edu.udb.domain.Departamento;
-import sv.edu.udb.domain.Empleado;
-import sv.edu.udb.domain.Tipocontratacion;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Getter
 @Setter

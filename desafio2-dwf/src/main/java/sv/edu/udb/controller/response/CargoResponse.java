@@ -10,6 +10,7 @@ import lombok.experimental.FieldNameConstants;
 @Builder(toBuilder = true)
 @FieldNameConstants
 public class CargoResponse {
+    private Long idCargo; // Agregado para incluir el ID en la respuesta
     private String cargo;
     private String descripcionCargo;
     private Boolean jefatura;
