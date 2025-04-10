@@ -13,7 +13,12 @@ export const getDepartamentos = async () => {
 
     const data = await response.json();
     console.log("Datos de departamentos:", data);
-    return data;
+
+    // Ensure each departamento has a valid `id` field
+    return data.map((dep) => ({
+      ...dep,
+      id: dep.idDepartamento, // Map `idDepartamento` to `id`
+    }));
   } catch (error) {
     console.error("Error al obtener departamentos:", error.message);
     return [];
@@ -33,7 +38,9 @@ export const getDepartamentoById = async (id) => {
 
     const data = await response.json();
     console.log("Departamento obtenido:", data);
-    return data;
+
+    // Map `idDepartamento` to `id`
+    return { ...data, id: data.idDepartamento };
   } catch (error) {
     console.error("Error al obtener departamento:", error.message);
     return null;

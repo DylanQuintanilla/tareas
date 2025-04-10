@@ -32,10 +32,17 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setDepartamentos(await getDepartamentos());
-        setEmpleados(await getEmpleados());
-        setCargos(await getCargos());
-        setTiposContratacion(await getTiposContratacion());
+        const [departamentosData, empleadosData, cargosData, tiposContratacionData] = await Promise.all([
+          getDepartamentos(),
+          getEmpleados(),
+          getCargos(),
+          getTiposContratacion(),
+        ]);
+
+        setDepartamentos(departamentosData);
+        setEmpleados(empleadosData);
+        setCargos(cargosData);
+        setTiposContratacion(tiposContratacionData);
       } catch (err) {
         console.error("Error al cargar datos:", err.message);
         setError("Error al cargar datos para el formulario.");
@@ -48,7 +55,7 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
     const { name, value } = e.target;
     setContratacion((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === "estado" ? value === "true" : value,
     }));
   };
 
@@ -86,7 +93,7 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
               <option value="">Seleccione un departamento</option>
               {departamentos.map((dep) => (
                 <option key={dep.id} value={dep.id}>
-                  {dep.nombre}
+                  {dep.nombreDepartamento}
                 </option>
               ))}
             </select>
@@ -104,7 +111,7 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
               <option value="">Seleccione un empleado</option>
               {empleados.map((emp) => (
                 <option key={emp.id} value={emp.id}>
-                  {emp.nombrePersona}
+                  {emp.nombrePersona} ({emp.usuario})
                 </option>
               ))}
             </select>
@@ -124,7 +131,7 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
               <option value="">Seleccione un cargo</option>
               {cargos.map((cargo) => (
                 <option key={cargo.id} value={cargo.id}>
-                  {cargo.nombre}
+                  {cargo.cargo}
                 </option>
               ))}
             </select>
@@ -142,7 +149,7 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
               <option value="">Seleccione un tipo de contratación</option>
               {tiposContratacion.map((tipo) => (
                 <option key={tipo.id} value={tipo.id}>
-                  {tipo.nombre}
+                  {tipo.tipoContratacion}
                 </option>
               ))}
             </select>
@@ -180,13 +187,13 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
           <select
             id="estado"
             name="estado"
-            value={contratacion.estado}
+            value={contratacion.estado.toString()}
             onChange={handleChange}
             required
             className="form-control styled-select"
           >
-            <option value={true}>Activo</option>
-            <option value={false}>Inactivo</option>
+            <option value="true">Activo</option>
+            <option value="false">Inactivo</option>
           </select>
         </div>
         <div className="button-group">
