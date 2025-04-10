@@ -1,162 +1,135 @@
 // /service/EmpleadoService.js
 
-const useMockData = true; // Set to true to use mock data instead of API
+const API_URL = "http://localhost:8080/empleados"; // Ensure this matches your backend's base URL
+
+const useMockData = true; // Set to true to use mock data instead of APId
 
 const mockEmpleados = [
   {
     id: 1,
-    nombre: "Juan",
-    apellido: "Pérez",
-    email: "juan.perez@example.com",
-    fechaIngreso: "2023-01-15",
-    cargo: "Gerente de Ventas"
+    nombrePersona: "Juan Pérez",
+    usuario: "juan.perez",
+    numeroDUI: "06371984-6",
+    numeroTelefono: "12345678",
+    correoInstitucional: "juan.perez@empresa.com",
+    fechaNacimiento: "1990-01-01",
   },
   {
     id: 2,
-    nombre: "María",
-    apellido: "Gómez",
-    email: "maria.gomez@example.com",
-    fechaIngreso: "2022-11-01",
-    cargo: "Analista de Datos"
-  }
+    nombrePersona: "María Gómez",
+    usuario: "maria.gomez",
+    numeroDUI: "12345678-9",
+    numeroTelefono: "87654321",
+    correoInstitucional: "maria.gomez@empresa.com",
+    fechaNacimiento: "1985-05-15",
+  },
 ];
 
 // Obtener la lista de empleados.
 export const getEmpleados = async () => {
-  if (useMockData) {
-    console.log("Usando datos mock para empleados.");
-    return mockEmpleados;
-  }
   try {
-    const response = await fetch('http://localhost:8000/api/v1/empleado', {
-      method: 'GET',
+    console.log("Fetching empleados from:", API_URL); // Debugging: Log the API URL
+    const response = await fetch(API_URL, {
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     });
 
-    const data = await response.json();
-    console.log('Datos de empleados:', data);
-
     if (!response.ok) {
-      console.log('Error en la respuesta:', data.message);
-      return [];
+      throw new Error(`Error al obtener empleados: ${response.status} ${response.statusText}`);
     }
-    // Se asume que la API envía un arreglo en data.data.
-    return Array.isArray(data.data) ? data.data : [];
+
+    const data = await response.json();
+    console.log("Datos de empleados desde la API:", data); // Debugging: Log the API response
+    return Array.isArray(data) ? data : [];
   } catch (error) {
-    console.log('Error al obtener empleados:', error.message);
+    console.error("Error al obtener empleados:", error.message);
     return [];
   }
 };
 
 // Obtener un empleado por ID.
 export const getEmpleadoById = async (id) => {
-  if (useMockData) {
-    console.log(`Usando datos mock para empleado con ID: ${id}`);
-    return mockEmpleados.find((empleado) => empleado.id === parseInt(id)) || null;
-  }
   try {
-    const response = await fetch(`http://localhost:8000/api/v1/empleado/${id}`, {
-      method: 'GET',
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
     });
 
-    const data = await response.json();
-    console.log('Datos del empleado:', data);
-
     if (!response.ok) {
-      console.log('Error en la respuesta:', data.message);
-      return null;
+      throw new Error("Error al obtener empleado");
     }
-    return data;
+
+    return await response.json();
   } catch (error) {
-    console.log('Error al obtener empleado:', error.message);
+    console.error("Error al obtener empleado:", error.message);
     return null;
   }
 };
 
 // Crear un nuevo empleado.
-export const saveEmpleado = async (empleado) => {
-  if (useMockData) {
-    console.log("Usando datos mock para crear empleado.");
-    const newEmpleado = { ...empleado, id: mockEmpleados.length + 1 };
-    mockEmpleados.push(newEmpleado);
-    return newEmpleado;
-  }
+export const createEmpleado = async (empleado) => {
   try {
-    const response = await fetch('http://localhost:8000/api/v1/empleado', {
-      method: 'POST',
+    console.log("Enviando datos del empleado:", empleado); // Debugging: Log the request body
+    const response = await fetch(API_URL, {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      // Se envía el objeto empleado completo.
-      body: JSON.stringify(empleado)
+      body: JSON.stringify({
+        nombrePersona: empleado.nombrePersona,
+        usuario: empleado.usuario,
+        numeroDUI: empleado.numeroDUI,
+        numeroTelefono: empleado.numeroTelefono,
+        correoInstitucional: empleado.correoInstitucional,
+        fechaNacimiento: empleado.fechaNacimiento,
+      }),
     });
 
-    const data = await response.json();
-    console.log('Datos:', data);
-
     if (!response.ok) {
-      console.log('Error en la respuesta:', data.message);
-      return null;
+      const errorData = await response.json();
+      console.error("Error en la respuesta:", errorData.message); // Debugging: Log the backend error
+      throw new Error(errorData.message || "Error al crear empleado");
     }
-    return data.data;
+
+    const data = await response.json();
+    console.log("Empleado creado exitosamente:", data); // Debugging: Log the response
+    return data;
   } catch (error) {
-    console.log('Error al crear empleado:', error.message);
+    console.error("Error al crear empleado:", error.message);
     return null;
   }
 };
 
 // Actualizar un empleado existente.
 export const updateEmpleado = async (id, empleado) => {
-  if (useMockData) {
-    console.log(`Usando datos mock para actualizar empleado con ID: ${id}`);
-    const index = mockEmpleados.findIndex((emp) => emp.id === parseInt(id));
-    if (index !== -1) {
-      mockEmpleados[index] = { ...mockEmpleados[index], ...empleado };
-      return mockEmpleados[index];
-    }
-    return null;
-  }
   try {
-    const response = await fetch(`http://localhost:8000/api/v1/empleado/${id}`, {
-      method: 'PUT',
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(empleado)
+      body: JSON.stringify(empleado),
     });
 
-    const data = await response.json();
-    console.log('Datos:', data);
-
     if (!response.ok) {
-      console.log('Error en la respuesta:', data.message);
-      return null;
+      throw new Error("Error al actualizar empleado");
     }
-    return data.data;
+
+    return await response.json();
   } catch (error) {
-    console.log('Error al actualizar empleado:', error.message);
+    console.error("Error al actualizar empleado:", error.message);
     return null;
   }
 };
 
 // Eliminar un empleado.
 export const deleteEmpleado = async (id) => {
-  if (useMockData) {
-    console.log(`Usando datos mock para eliminar empleado con ID: ${id}`);
-    const index = mockEmpleados.findIndex((emp) => emp.id === parseInt(id));
-    if (index !== -1) {
-      const deletedEmpleado = mockEmpleados.splice(index, 1);
-      return deletedEmpleado[0];
-    }
-    throw new Error("Empleado no encontrado.");
-  }
   try {
-    const response = await fetch(`http://localhost:8000/api/v1/empleado/${id}`, {
+    const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -164,15 +137,12 @@ export const deleteEmpleado = async (id) => {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      console.error("Error en la respuesta:", data.message);
-      throw new Error(data.message || "Error al eliminar el empleado.");
+      throw new Error("Error al eliminar empleado");
     }
 
-    console.log(`Empleado con ID ${id} eliminado correctamente.`);
     return true;
   } catch (error) {
     console.error("Error al eliminar empleado:", error.message);
-    throw error;
+    return false;
   }
 };

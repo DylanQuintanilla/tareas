@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useParams } from "next/navigation";
 import { getEmpleadoById } from "@/service/EmpleadoService";
 
 const VerEmpleado = () => {
@@ -21,7 +21,11 @@ const VerEmpleado = () => {
       setIsLoading(true);
       try {
         const data = await getEmpleadoById(id);
-        setEmpleado(data);
+        if (data) {
+          setEmpleado(data);
+        } else {
+          setError("No se encontró el empleado.");
+        }
       } catch (err) {
         setError(err.message || "Error al obtener los datos del empleado.");
       } finally {
@@ -36,9 +40,9 @@ const VerEmpleado = () => {
     return (
       <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Header />
-        <div className="container">
+        <main className="container my-5">
           <h2>Cargando empleado...</h2>
-        </div>
+        </main>
         <Footer />
       </div>
     );
@@ -48,9 +52,9 @@ const VerEmpleado = () => {
     return (
       <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Header />
-        <div className="container">
+        <main className="container my-5">
           <h2>Error: {error}</h2>
-        </div>
+        </main>
         <Footer />
       </div>
     );
@@ -60,9 +64,9 @@ const VerEmpleado = () => {
     return (
       <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Header />
-        <div className="container">
+        <main className="container my-5">
           <h2>No se encontró el empleado</h2>
-        </div>
+        </main>
         <Footer />
       </div>
     );
@@ -72,13 +76,13 @@ const VerEmpleado = () => {
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
       <main className="container my-5">
-        <h2>Detalle del Empleado</h2>
-        <div className="empleado-detalle">
-          <p><strong>Nombre:</strong> {empleado.nombre} {empleado.apellido}</p>
-          <p><strong>Email:</strong> {empleado.email}</p>
-          <p><strong>Cargo:</strong> {empleado.cargo}</p>
-          <p><strong>Fecha de Ingreso:</strong> {empleado.fechaIngreso}</p>
-        </div>
+        <h2 className="form-title">Detalles del Empleado</h2>
+        <p><strong>Nombre:</strong> {empleado.nombrePersona}</p>
+        <p><strong>Usuario:</strong> {empleado.usuario}</p>
+        <p><strong>DUI:</strong> {empleado.numeroDUI}</p>
+        <p><strong>Teléfono:</strong> {empleado.numeroTelefono}</p>
+        <p><strong>Correo:</strong> {empleado.correoInstitucional}</p>
+        <p><strong>Fecha de Nacimiento:</strong> {empleado.fechaNacimiento}</p>
       </main>
       <Footer />
     </div>

@@ -3,11 +3,12 @@ import React, { useEffect, useState } from "react";
 import EmpleadoFormulario from "@/components/EmpleadoFormulario";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getEmpleadoById } from "@/service/EmpleadoService";
 
 const EditarEmpleado = () => {
   const { id } = useParams(); // Extract the employee ID from the URL
+  const router = useRouter();
   const [empleado, setEmpleado] = useState(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +37,10 @@ const EditarEmpleado = () => {
 
     fetchEmpleado();
   }, [id]);
+
+  const handleSave = () => {
+    router.push("/dashboard/listado-empleados");
+  };
 
   if (isLoading) {
     return (
@@ -78,7 +83,7 @@ const EditarEmpleado = () => {
       <Header />
       <main className="container my-5">
         <h2 className="form-title">Editar Empleado</h2>
-        <EmpleadoFormulario empleadoInicial={empleado} />
+        <EmpleadoFormulario empleadoInicial={empleado} onSave={handleSave} />
       </main>
       <Footer />
     </div>

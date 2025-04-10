@@ -15,8 +15,10 @@ const ListadoEmpleados = () => {
       setIsLoading(true);
       try {
         const data = await getEmpleados();
+        console.log("Empleados obtenidos:", data); // Debugging: Log the fetched data
         setEmpleados(data);
       } catch (err) {
+        console.error("Error fetching empleados:", err.message); // Debugging: Log the error
         setError(err.message || "Error al obtener la lista de empleados.");
       } finally {
         setIsLoading(false);
@@ -61,8 +63,12 @@ const ListadoEmpleados = () => {
         <h2>Listado de Empleados</h2>
         <div className="card-container">
           {empleados.length > 0 ? (
-            empleados.map((empleado) => (
-              <EmpleadoCard key={empleado.id} empleado={empleado} onDelete={handleDelete} />
+            empleados.map((empleado, index) => (
+              <EmpleadoCard
+                key={empleado.id || index} // Use `empleado.id` if available, otherwise fallback to `index`
+                empleado={empleado}
+                onDelete={handleDelete}
+              />
             ))
           ) : (
             <p>No hay empleados registrados.</p>

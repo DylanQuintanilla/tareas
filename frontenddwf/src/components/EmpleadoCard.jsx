@@ -1,46 +1,41 @@
 "use client";
-import React, { useState } from "react";
-import Link from "next/link";
-import { deleteEmpleado } from "@/service/EmpleadoService";
+import React from "react";
 import { useRouter } from "next/navigation";
+import { deleteEmpleado } from "@/service/EmpleadoService";
 
-const EmpleadoCard = ({ empleado }) => {
+export default function EmpleadoCard({ empleado, onDelete }) {
   const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async (e) => {
-    e.preventDefault();
-    if (confirm("¿Estás seguro de eliminar este empleado?")) {
-      setIsDeleting(true);
-      try {
-        await deleteEmpleado(empleado.id);
-        alert("Empleado eliminado correctamente.");
-        router.refresh(); // Refresh the page to update the list of employees
-      } catch (err) {
-        console.error("Error al eliminar el empleado:", err);
-        alert("Hubo un error al intentar eliminar el empleado.");
-      } finally {
-        setIsDeleting(false);
-      }
+  const handleDelete = async (id) => {
+    try {
+      await deleteEmpleado(id);
+      onDelete(id); // Notify parent to update the list
+    } catch (error) {
+      console.error("Error deleting empleado:", error);
     }
   };
 
+  const handleEdit = (id) => {
+    router.push(`/dashboard/editar-empleado/${id}`);
+  };
+
+  const handleView = (id) => {
+    router.push(`/dashboard/ver-empleado/${id}`);
+  };
+
   return (
-    <div className="empleado-card">
-      <h3>{empleado.nombre} {empleado.apellido}</h3>
-      <p><strong>Email:</strong> {empleado.email}</p>
-      <p><strong>Cargo:</strong> {empleado.cargo}</p>
-      <p><strong>Fecha de Ingreso:</strong> {empleado.fechaIngreso}</p>
-      <div className="card-actions" style={{ marginTop: "1rem", display: "flex", gap: "1rem", justifyContent: "center" }}>
-        <Link href={`/dashboard/editar-empleado/${empleado.id}`}>
-          <button className="action-button">Editar</button>
-        </Link>
-        <button className="action-button" onClick={handleDelete} disabled={isDeleting}>
-          {isDeleting ? "Eliminando..." : "Eliminar"}
-        </button>
+    <div className="card">
+      <h3>{empleado.nombrePersona}</h3>
+      <p>Usuario: {empleado.usuario}</p>
+      <p>DUI: {empleado.numeroDUI}</p>
+      <p>Teléfono: {empleado.numeroTelefono}</p>
+      <p>Correo: {empleado.correoInstitucional}</p>
+      <p>Fecha Nacimiento: {empleado.fechaNacimiento}</p>
+      <div className="button-group">
+        <button onClick={() => handleView(empleado.id)}>Ver</button>
+        <button onClick={() => handleEdit(empleado.id)}>Editar</button>
+        <button onClick={() => handleDelete(empleado.id)}>Eliminar</button>
       </div>
     </div>
   );
-};
-
-export default EmpleadoCard;
+}

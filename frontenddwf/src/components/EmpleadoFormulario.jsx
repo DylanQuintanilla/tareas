@@ -1,20 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { saveEmpleado, updateEmpleado } from "@/service/EmpleadoService";
+import { createEmpleado, updateEmpleado } from "@/service/EmpleadoService";
 
-const EmpleadoFormulario = ({ empleadoInicial = null }) => {
+const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Initialize the form state with the provided employee data or default values
   const [empleado, setEmpleado] = useState({
-    nombre: "",
-    apellido: "",
-    email: "",
-    fechaIngreso: "",
-    cargo: "",
+    nombrePersona: "",
+    usuario: "",
+    numeroDUI: "",
+    numeroTelefono: "",
+    correoInstitucional: "",
+    fechaNacimiento: "",
   });
 
   useEffect(() => {
@@ -36,14 +36,12 @@ const EmpleadoFormulario = ({ empleadoInicial = null }) => {
     setError("");
     setIsLoading(true);
     try {
-      if (empleadoInicial) {
-        // Update existing employee
-        await updateEmpleado(empleadoInicial.id, empleado);
+      if (empleado.id) {
+        await updateEmpleado(empleado.id, empleado);
       } else {
-        // Create new employee
-        await saveEmpleado(empleado);
+        await createEmpleado(empleado);
       }
-      // Redirect to the employee list after successful creation or update
+      onSave();
       router.push("/dashboard/listado-empleados");
     } catch (err) {
       setError(err.message || "Error al guardar los datos del empleado.");
@@ -58,25 +56,25 @@ const EmpleadoFormulario = ({ empleadoInicial = null }) => {
       <form onSubmit={handleSubmit}>
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="nombre">Nombre</label>
+            <label htmlFor="nombrePersona">Nombre Persona</label>
             <input
               type="text"
-              id="nombre"
-              name="nombre"
-              placeholder="Nombre"
-              value={empleado.nombre}
+              id="nombrePersona"
+              name="nombrePersona"
+              placeholder="Nombre Persona"
+              value={empleado.nombrePersona}
               onChange={handleChange}
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="apellido">Apellido</label>
+            <label htmlFor="usuario">Usuario</label>
             <input
               type="text"
-              id="apellido"
-              name="apellido"
-              placeholder="Apellido"
-              value={empleado.apellido}
+              id="usuario"
+              name="usuario"
+              placeholder="Usuario"
+              value={empleado.usuario}
               onChange={handleChange}
               required
             />
@@ -84,44 +82,52 @@ const EmpleadoFormulario = ({ empleadoInicial = null }) => {
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="email">Correo Electrónico</label>
+            <label htmlFor="numeroDUI">Número DUI</label>
             <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="ejemplo@correo.com"
-              value={empleado.email}
+              type="text"
+              id="numeroDUI"
+              name="numeroDUI"
+              placeholder="Número DUI"
+              value={empleado.numeroDUI}
               onChange={handleChange}
-              required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="fechaIngreso">Fecha de Ingreso</label>
+            <label htmlFor="numeroTelefono">Número Teléfono</label>
             <input
-              type="date"
-              id="fechaIngreso"
-              name="fechaIngreso"
-              value={empleado.fechaIngreso}
+              type="text"
+              id="numeroTelefono"
+              name="numeroTelefono"
+              placeholder="Número Teléfono"
+              value={empleado.numeroTelefono}
               onChange={handleChange}
-              required
             />
           </div>
         </div>
         <div className="form-group">
-          <label htmlFor="cargo">Cargo</label>
+          <label htmlFor="correoInstitucional">Correo Institucional</label>
           <input
-            type="text"
-            id="cargo"
-            name="cargo"
-            placeholder="Ej. Gerente de área"
-            value={empleado.cargo}
+            type="email"
+            id="correoInstitucional"
+            name="correoInstitucional"
+            placeholder="ejemplo@correo.com"
+            value={empleado.correoInstitucional}
             onChange={handleChange}
-            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="fechaNacimiento">Fecha Nacimiento</label>
+          <input
+            type="date"
+            id="fechaNacimiento"
+            name="fechaNacimiento"
+            value={empleado.fechaNacimiento}
+            onChange={handleChange}
           />
         </div>
         <div className="button-group">
           <button type="submit" disabled={isLoading}>
-            {isLoading ? "Guardando..." : empleadoInicial ? "Actualizar" : "Crear"}
+            {isLoading ? "Guardando..." : empleado.id ? "Actualizar" : "Crear"}
           </button>
         </div>
       </form>
