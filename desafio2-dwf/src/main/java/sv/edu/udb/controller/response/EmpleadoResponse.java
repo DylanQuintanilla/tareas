@@ -1,10 +1,11 @@
 package sv.edu.udb.controller.response;
 
-import lombok.*;
-import lombok.experimental.FieldNameConstants;
-
-import java.security.PrivateKey;
 import java.time.LocalDate;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 @Getter
 @Setter

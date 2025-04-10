@@ -1,16 +1,17 @@
 package sv.edu.udb.service.implementation;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import sv.edu.udb.controller.request.EmpleadoRequest;
 import sv.edu.udb.controller.response.EmpleadoResponse;
+import sv.edu.udb.domain.Empleado;
 import sv.edu.udb.repository.EmpleadoRepository;
 import sv.edu.udb.service.EmpleadoService;
 import sv.edu.udb.service.mapper.EmpleadoMapper;
-import sv.edu.udb.domain.Empleado;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,10 +60,9 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 
     @Override
     public EmpleadoResponse findEmpleadoById(final Long id) {
-        return empleadoMapper.toEmpleadoResponse(
-                empleadoRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Empleado no encontrado con ID: " + id))
-        );
+        Empleado empleado = empleadoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Empleado no encontrado con ID: " + id));
+        return empleadoMapper.toEmpleadoResponse(empleado);
     }
 
     @Override
