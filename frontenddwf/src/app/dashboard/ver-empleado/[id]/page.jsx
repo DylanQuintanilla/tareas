@@ -15,11 +15,13 @@ const VerEmpleado = () => {
     const fetchEmpleado = async () => {
       if (!id) {
         setError("ID del empleado no proporcionado.");
+        console.error("ID del empleado no proporcionado."); // Debugging: Log missing ID
         return;
       }
 
       setIsLoading(true);
       try {
+        console.log(`Fetching empleado with ID: ${id}`); // Debugging: Log the ID
         const data = await getEmpleadoById(id);
         if (data) {
           setEmpleado(data);
@@ -27,6 +29,7 @@ const VerEmpleado = () => {
           setError("No se encontró el empleado.");
         }
       } catch (err) {
+        console.error("Error fetching empleado:", err.message); // Debugging: Log the error
         setError(err.message || "Error al obtener los datos del empleado.");
       } finally {
         setIsLoading(false);

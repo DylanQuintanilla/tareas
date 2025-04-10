@@ -8,6 +8,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Initialize the form state with the provided employee data or default values
   const [empleado, setEmpleado] = useState({
     nombrePersona: "",
     usuario: "",
@@ -37,10 +38,13 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
     setIsLoading(true);
     try {
       if (empleado.id) {
+        // Update existing employee
         await updateEmpleado(empleado.id, empleado);
       } else {
+        // Create new employee
         await createEmpleado(empleado);
       }
+      // Redirect to the employee list after successful creation or update
       onSave();
       router.push("/dashboard/listado-empleados");
     } catch (err) {

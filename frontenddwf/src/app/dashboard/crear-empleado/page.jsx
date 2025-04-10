@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import EmpleadoFormulario from "@/components/EmpleadoFormulario";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -7,9 +7,10 @@ import { useRouter } from "next/navigation";
 
 const CrearEmpleado = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSave = () => {
-    // Redirect to the employee list after saving
     router.push("/dashboard/listado-empleados");
   };
 
@@ -18,7 +19,8 @@ const CrearEmpleado = () => {
       <Header />
       <main className="container my-5">
         <h2 className="form-title">Crear Nuevo Empleado</h2>
-        <EmpleadoFormulario onSave={handleSave} />
+        {error && <p className="error">{error}</p>}
+        <EmpleadoFormulario onSave={handleSave} isLoading={isLoading} />
       </main>
       <Footer />
     </div>

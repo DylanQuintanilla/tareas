@@ -3,24 +3,29 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { deleteEmpleado } from "@/service/EmpleadoService";
 
-export default function EmpleadoCard({ empleado, onDelete }) {
+export default function EmpleadoCard({ empleado }) {
   const router = useRouter();
 
-  const handleDelete = async (id) => {
-    try {
-      await deleteEmpleado(id);
-      onDelete(id); // Notify parent to update the list
-    } catch (error) {
-      console.error("Error deleting empleado:", error);
+  const handleDelete = async () => {
+    if (confirm("¿Estás seguro de eliminar este empleado?")) {
+      try {
+        const success = await deleteEmpleado(empleado.id);
+        if (success) {
+          alert("Empleado eliminado exitosamente.");
+          router.push("/dashboard/listado-empleados");
+        }
+      } catch (error) {
+        console.error("Error al eliminar empleado:", error);
+      }
     }
   };
 
-  const handleEdit = (id) => {
-    router.push(`/dashboard/editar-empleado/${id}`);
+  const handleEdit = () => {
+    router.push(`/dashboard/editar-empleado/${empleado.id}`);
   };
 
-  const handleView = (id) => {
-    router.push(`/dashboard/ver-empleado/${id}`);
+  const handleView = () => {
+    router.push(`/dashboard/ver-empleado/${empleado.id}`);
   };
 
   return (
@@ -32,9 +37,9 @@ export default function EmpleadoCard({ empleado, onDelete }) {
       <p>Correo: {empleado.correoInstitucional}</p>
       <p>Fecha Nacimiento: {empleado.fechaNacimiento}</p>
       <div className="button-group">
-        <button onClick={() => handleView(empleado.id)}>Ver</button>
-        <button onClick={() => handleEdit(empleado.id)}>Editar</button>
-        <button onClick={() => handleDelete(empleado.id)}>Eliminar</button>
+        <button onClick={handleView}>Ver</button>
+        <button onClick={handleEdit}>Editar</button>
+        <button onClick={handleDelete}>Eliminar</button>
       </div>
     </div>
   );
