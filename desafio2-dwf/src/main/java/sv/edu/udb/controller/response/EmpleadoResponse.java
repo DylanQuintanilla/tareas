@@ -3,6 +3,7 @@ package sv.edu.udb.controller.response;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
 
+import java.security.PrivateKey;
 import java.time.LocalDate;
 
 @Getter
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @FieldNameConstants
 public class EmpleadoResponse {
+    private Long idEmpleado;
     private String nombrePersona;
     private String usuario;
     private String numeroDUI;

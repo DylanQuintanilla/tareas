@@ -5,9 +5,7 @@ export const getEmpleados = async () => {
   try {
     const response = await fetch(API_URL, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
@@ -16,12 +14,21 @@ export const getEmpleados = async () => {
 
     const data = await response.json();
     console.log("Datos de empleados:", data);
-    return data; // Assuming the API returns a list of employees
+
+    // Mapea para que cada empleado tenga "id" asignado a "idEmpleado"
+    const empleadosConId = data.map(emp => ({
+      ...emp,
+      id: emp.idEmpleado  // Aquí mapeamos directamente
+    }));
+
+    return empleadosConId;
   } catch (error) {
     console.error("Error al obtener empleados:", error.message);
     return [];
   }
 };
+
+
 
 // Obtener un empleado por ID.
 export const getEmpleadoById = async (id) => {
@@ -29,29 +36,29 @@ export const getEmpleadoById = async (id) => {
     if (!id) {
       throw new Error("El ID del empleado no fue proporcionado.");
     }
-
-    console.log(`Fetching empleado with ID: ${id}`); // Debugging: Log the ID
+    console.log(`Fetching empleado con ID: ${id}`);
     const response = await fetch(`${API_URL}/${id}`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Error en la respuesta:", errorData.message); // Debugging: Log the backend error
+      console.error("Error en la respuesta:", errorData.message);
       throw new Error(errorData.message || `Error al obtener empleado: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log("Empleado obtenido exitosamente:", data); // Debugging: Log the response
-    return data; // Assuming the API returns a single employee object
+    console.log("Empleado obtenido exitosamente:", data);
+
+    // Mapea el identificador
+    return { ...data, id: data.idEmpleado };
   } catch (error) {
     console.error("Error al obtener empleado:", error.message);
     return null;
   }
 };
+
 
 // Crear un nuevo empleado.
 export const createEmpleado = async (empleado) => {
@@ -87,14 +94,11 @@ export const createEmpleado = async (empleado) => {
   }
 };
 
-// Actualizar un empleado existente.
 export const updateEmpleado = async (id, empleado) => {
   try {
     const response = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(empleado),
     });
 
@@ -104,10 +108,10 @@ export const updateEmpleado = async (id, empleado) => {
 
     const data = await response.json();
     console.log("Empleado actualizado:", data);
-    return data; // Assuming the API returns the updated employee object
+    return { ...data, id: data.id || data._id };
   } catch (error) {
     console.error("Error al actualizar empleado:", error.message);
-    return null;
+    throw error;
   }
 };
 

@@ -1,91 +1,86 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import EmpleadoFormulario from "@/components/EmpleadoFormulario";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from "next/navigation";
-import { getEmpleadoById } from "@/service/EmpleadoService";
+import EmpleadoFormulario from "@/components/EmpleadoFormulario";
+import { getEmpleadoById, updateEmpleado } from "@/service/EmpleadoService";
 
 const EditarEmpleado = () => {
-  const { id } = useParams(); // Extract the employee ID from the URL
+  const params = useParams();
   const router = useRouter();
-  const [empleado, setEmpleado] = useState(null);
-  const [error, setError] = useState("");
+  
+  // Estado inicial vacío para el empleado
+  const [empleado, setEmpleado] = useState({
+    nombrePersona: "",
+    usuario: "",
+    numeroDUI: "",
+    numeroTelefono: "",
+    correoInstitucional: "",
+    fechaNacimiento: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
+  // Cargar los datos del empleado si existe params.id
   useEffect(() => {
-    const fetchEmpleado = async () => {
-      if (!id) {
-        setError("ID del empleado no proporcionado.");
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const data = await getEmpleadoById(id);
-        if (data) {
-          setEmpleado(data);
-        } else {
-          setError("No se encontró el empleado.");
+    if (params.id) {
+      const fetchEmpleado = async () => {
+        try {
+          setIsLoading(true);
+          const data = await getEmpleadoById(params.id);
+          if (data) {
+            setEmpleado(data);
+          } else {
+            setError("Empleado no encontrado.");
+          }
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (err) {
-        setError(err.message || "Error al obtener los datos del empleado.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      };
+      fetchEmpleado();
+    } else {
+      setError("ID del empleado no proporcionado.");
+      console.error("ID del empleado no proporcionado.");
+    }
+  }, [params.id]);
 
-    fetchEmpleado();
-  }, [id]);
-
-  const handleSave = () => {
-    router.push("/dashboard/listado-empleados");
+  // Función para guardar los cambios, similar a la de Jugador
+  const handleSave = async (updatedEmpleado) => {
+    try {
+      setIsLoading(true);
+      const data = await updateEmpleado(params.id, updatedEmpleado);
+      alert("Empleado actualizado exitosamente.");
+      // Asegúrate de que data.id contenga el ID correcto
+      router.push(`/dashboard/ver-empleado/${data.id}`);
+    } catch (err) {
+      console.error("Error al actualizar empleado:", err.message);
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isLoading) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        <Header />
-        <main className="container my-5">
-          <h2>Cargando empleado...</h2>
-        </main>
-        <Footer />
+      <div className="container">
+        <h2>Cargando empleado...</h2>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        <Header />
-        <main className="container my-5">
-          <h2>Error: {error}</h2>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!empleado) {
-    return (
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-        <Header />
-        <main className="container my-5">
-          <h2>No se encontró el empleado</h2>
-        </main>
-        <Footer />
+      <div className="container">
+        <h2>Error: {error}</h2>
       </div>
     );
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Header />
-      <main className="container my-5">
-        <h2 className="form-title">Editar Empleado</h2>
-        <EmpleadoFormulario empleadoInicial={empleado} onSave={handleSave} />
-      </main>
-      <Footer />
+    <div className="container my-5">
+      <h2>{params.id ? "Editar Empleado" : "Crear Empleado"}</h2>
+      <EmpleadoFormulario empleadoInicial={empleado} onSave={handleSave} />
     </div>
   );
 };
