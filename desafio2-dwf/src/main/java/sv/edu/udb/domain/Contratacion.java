@@ -25,7 +25,7 @@ public class Contratacion {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idEmpleado")
-    private Empleado idEmpleado;
+    private Empleado empleado;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idCargo")

@@ -17,7 +17,6 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @FieldNameConstants
 public class ContratacionResponse {
-    private Long id;
     private LocalDate fechaContratacion;
     private BigDecimal salario;
     private Boolean estado;

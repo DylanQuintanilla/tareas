@@ -1,109 +1,79 @@
 package sv.edu.udb.service.implementation;
 
-import jakarta.persistence.EntityNotFoundException;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sv.edu.udb.controller.request.ContratacionRequest;
 import sv.edu.udb.controller.response.ContratacionResponse;
-import sv.edu.udb.domain.*;
-import sv.edu.udb.repository.*;
+import sv.edu.udb.domain.Contratacion;
+
+import sv.edu.udb.exception.ResourceNotFoundException;
+import sv.edu.udb.repository.ContratacionRepository;
 import sv.edu.udb.service.ContratacionService;
 import sv.edu.udb.service.mapper.ContratacionMapper;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 public class ContratacionServiceImpl implements ContratacionService {
-    private final EmpleadoRepository empleadoRepository;
-    private final DepartamentoRepository departamentoRepository;
-    private final CargoRepository cargoRepository;
-    private final TipoContratacionRepository tipoContratacionRepository;
-    @NonNull
+
     private final ContratacionRepository contratacionRepository;
-    @NonNull
     private final ContratacionMapper contratacionMapper;
 
-    @Override
-    public List<ContratacionResponse> findAllContrataciones() {
-        return contratacionMapper.toContratacionResponseList(contratacionRepository.findAll());
+    @Autowired
+    public ContratacionServiceImpl(ContratacionRepository contratacionRepository,
+                                   ContratacionMapper contratacionMapper) {
+        this.contratacionRepository = contratacionRepository;
+        this.contratacionMapper = contratacionMapper;
     }
 
     @Override
-    public ContratacionResponse findContratacionById(final Long id) {
-        return contratacionMapper.toContratacionResponse(
-                contratacionRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("Contratación no encontrada con ID: " + id))
-        );
-    }
-
-
-    @Override
-    public ContratacionResponse updateContratacion(final Long id, final ContratacionRequest request) {
-        // Carga la contratación existente
-        Contratacion contratacionToUpdate = contratacionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Contratación no encontrada con ID: " + id));
-
-        // Carga las entidades relacionadas por sus IDs
-        Departamento departamento = departamentoRepository.findById(request.getIdDepartamento())
-                .orElseThrow(() -> new EntityNotFoundException("Departamento no encontrado"));
-
-        Empleado empleado = empleadoRepository.findById(request.getIdEmpleado())
-                .orElseThrow(() -> new EntityNotFoundException("Empleado no encontrado"));
-
-        Cargo cargo = cargoRepository.findById(request.getIdCargo())
-                .orElseThrow(() -> new EntityNotFoundException("Cargo no encontrado"));
-
-        Tipocontratacion tipoContratacion = tipoContratacionRepository.findById(request.getIdTipoContratacion())
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de contratación no encontrado"));
-
-        // Actualiza los campos
-        contratacionToUpdate.setIdDepartamento(departamento);
-        contratacionToUpdate.setIdEmpleado(empleado);
-        contratacionToUpdate.setIdCargo(cargo);
-        contratacionToUpdate.setIdTipoContratacion(tipoContratacion); // Ahora es una entidad
-
-        // Guarda los cambios
-        return contratacionMapper.toContratacionResponse(
-                contratacionRepository.save(contratacionToUpdate)
-        );
+    @Transactional(readOnly = true)
+    public List<ContratacionResponse> findAll() {
+        List<Contratacion> contrataciones = contratacionRepository.findAll();
+        return contratacionMapper.toResponseList(contrataciones);
     }
 
     @Override
-    public void deleteContratacion(final Long id) {
+    @Transactional(readOnly = true)
+    public ContratacionResponse findById(Long id) {
+        Contratacion contratacion = contratacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Contratación no encontrada con ID: " + id));
+        return contratacionMapper.toResponse(contratacion);
+    }
+
+    @Override
+    @Transactional
+    public ContratacionResponse save(ContratacionRequest request) {
+        Contratacion contratacion = contratacionMapper.toEntity(request);
+        contratacion = contratacionRepository.save(contratacion);
+        return contratacionMapper.toResponse(contratacion);
+    }
+
+    @Override
+    @Transactional
+    public ContratacionResponse update(Long id, ContratacionRequest request) {
+        Contratacion contratacion = contratacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Contratación no encontrada con ID: " + id));
+
+        contratacionMapper.updateEntityFromRequest(request, contratacion);
+        contratacion = contratacionRepository.save(contratacion);
+
+        return contratacionMapper.toResponse(contratacion);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        if (!contratacionRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Contratación no encontrada con ID: " + id);
+        }
         contratacionRepository.deleteById(id);
     }
 
     @Override
-    public ContratacionResponse saveContratacion(ContratacionRequest request) {
-        // Carga las entidades por ID
-        Empleado empleado = empleadoRepository.findById(request.getIdEmpleado())
-                .orElseThrow(() -> new EntityNotFoundException("Empleado no encontrado"));
-
-        Departamento departamento = departamentoRepository.findById(request.getIdDepartamento())
-                .orElseThrow(() -> new EntityNotFoundException("Departamento no encontrado"));
-
-        Cargo cargo = cargoRepository.findById(request.getIdCargo())
-                .orElseThrow(() -> new EntityNotFoundException("Cargo no encontrado"));
-
-        Tipocontratacion tipo = tipoContratacionRepository.findById(request.getIdTipoContratacion())
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de contratación no encontrado"));
-
-        // Crea la contratación
-        Contratacion contratacion = Contratacion.builder()
-                .fechaContratacion(request.getFechaContratacion())
-                .salario(request.getSalario())
-                .estado(request.getEstado())
-                .idEmpleado(empleado)
-                .idDepartamento(departamento)
-                .idCargo(cargo)
-                .idTipoContratacion(tipo)
-                .build();
-
-        return contratacionMapper.toContratacionResponse(
-                contratacionRepository.save(contratacion)
-        );
+    @Transactional(readOnly = true)
+    public boolean existsById(Long id) {
+        return contratacionRepository.existsById(id);
     }
 }

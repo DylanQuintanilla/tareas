@@ -1,16 +1,14 @@
 package sv.edu.udb.controller.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import sv.edu.udb.controller.validation.Dui;
+import lombok.*;
+
 import sv.edu.udb.controller.validation.PhoneNumber;
+import sv.edu.udb.controller.validation.Dui;
 
 import java.time.LocalDate;
 
@@ -19,27 +17,28 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignora propiedades desconocidas
+@JsonInclude(JsonInclude.Include.NON_NULL) // No incluye valores devueltos nulos
 public class EmpleadoRequest {
     @NotBlank(message = "El nombre es obligatorio")
-    @Dui(message = "Formato de DUI inválido")
     private String nombrePersona;
 
-    @NotBlank(message = "Favor digitar el numero de DUI")
+    @NotBlank(message = "El DUI es requerido")
+    @Dui(message = "Formato de DUI inválido. Ejemplo: 06371984-6")
     private String numeroDUI;
 
     @NotBlank(message = "El usuario es requerido")
     private String usuario;
 
     @NotBlank(message = "El correo es obligatorio")
+    @Email(message = "Formato de correo electrónico inválido")
     private String correoInstitucional;
 
     @NotBlank(message = "El teléfono es obligatorio")
-    @PhoneNumber(message = "Formato de teléfono inválido", pattern = "^\\d{4}-\\d{4}$")
+    @PhoneNumber(message = "Formato de teléfono inválido")
     private String numeroTelefono;
 
     @NotNull(message = "La fecha de nacimiento es requerida")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate fechaNacimiento;
 
 }

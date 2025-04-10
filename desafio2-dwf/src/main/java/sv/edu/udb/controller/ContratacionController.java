@@ -19,30 +19,30 @@ public class ContratacionController {
 
     @GetMapping
     public List<ContratacionResponse> findAllContrataciones() {
-        return contratacionService.findAllContrataciones();
+        return contratacionService.findAll();
     }
 
     @GetMapping("/{id}")
     public ContratacionResponse getContratacionById(@PathVariable(name = "id") final Long id) {
-        return contratacionService.findContratacionById(id);
+        return contratacionService.findById(id);
     }
 
     @PostMapping
     @ResponseStatus(CREATED)
     public ContratacionResponse saveContratacion(@Valid @RequestBody final ContratacionRequest request) {
-        return contratacionService.saveContratacion(request);
+        return contratacionService.save(request);
     }
 
     @PutMapping("/{id}")
     public ContratacionResponse updateContratacion(
             @PathVariable(name = "id") final Long id,
             @Valid @RequestBody final ContratacionRequest request) {
-        return contratacionService.updateContratacion(id, request);
+        return contratacionService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
     public void deleteContratacion(@PathVariable(name = "id") final Long id) {
-        contratacionService.deleteContratacion(id);
+        contratacionService.delete(id);
     }
 }
