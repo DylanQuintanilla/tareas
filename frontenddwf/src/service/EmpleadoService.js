@@ -118,6 +118,11 @@ export const updateEmpleado = async (id, empleado) => {
 // Eliminar un empleado.
 export const deleteEmpleado = async (id) => {
   try {
+    if (!id) {
+      throw new Error("El ID del empleado no fue proporcionado.");
+    }
+
+    console.log(`Eliminando empleado con ID: ${id}`); // Debugging: Log the ID
     const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
       headers: {
@@ -126,7 +131,9 @@ export const deleteEmpleado = async (id) => {
     });
 
     if (!response.ok) {
-      throw new Error(`Error al eliminar empleado: ${response.status} ${response.statusText}`);
+      const errorData = await response.json();
+      console.error("Error en la respuesta:", errorData.message); // Debugging: Log the backend error
+      throw new Error(errorData.message || `Error al eliminar empleado: ${response.status}`);
     }
 
     console.log(`Empleado con ID ${id} eliminado exitosamente.`);

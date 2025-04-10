@@ -63,9 +63,9 @@ const ListadoEmpleados = () => {
         <h2>Listado de Empleados</h2>
         <div className="card-container">
           {empleados.length > 0 ? (
-            empleados.map((empleado, index) => (
+            empleados.map((empleado) => (
               <EmpleadoCard
-                key={empleado.id || index} // Use `empleado.id` if available, otherwise fallback to `index`
+                key={empleado.id}
                 empleado={empleado}
                 onDelete={handleDelete}
               />

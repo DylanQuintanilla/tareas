@@ -3,20 +3,29 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { deleteEmpleado } from "@/service/EmpleadoService";
 
-export default function EmpleadoCard({ empleado }) {
+export default function EmpleadoCard({ empleado, onDelete }) {
   const router = useRouter();
-  console.log("Empleado recibido:", empleado);
-  console.log("Keys del objeto empleado:", Object.keys(empleado));
 
-  const handleEdit = () => {
-    if (empleado.id === undefined) {
-      console.error("El ID del empleado es undefined");
-      return; // Evita la navegación si no hay ID
+  const handleDelete = async () => {
+    if (!empleado.id) {
+      console.error("El ID del empleado es undefined o no válido:", empleado);
+      return;
     }
-    router.push(`/dashboard/editar-empleado/${empleado.id}`);
+
+    if (confirm("¿Estás seguro de eliminar este empleado?")) {
+      try {
+        const success = await deleteEmpleado(empleado.id);
+        if (success) {
+          alert("Empleado eliminado exitosamente.");
+          onDelete(empleado.id); // Notify parent to update the list
+        }
+      } catch (error) {
+        console.error("Error al eliminar empleado:", error);
+        alert("Error al eliminar empleado.");
+      }
+    }
   };
 
-  // Resto del componente...
   return (
     <div className="card">
       <h3>{empleado.nombrePersona}</h3>
@@ -27,20 +36,8 @@ export default function EmpleadoCard({ empleado }) {
       <p>Fecha Nacimiento: {empleado.fechaNacimiento}</p>
       <div className="button-group">
         <button onClick={() => router.push(`/dashboard/ver-empleado/${empleado.id}`)}>Ver</button>
-        <button onClick={handleEdit}>Editar</button>
-        <button onClick={async () => {
-            if (confirm("¿Estás seguro de eliminar este empleado?")) {
-              try {
-                const success = await deleteEmpleado(empleado.id);
-                if (success) {
-                  alert("Empleado eliminado exitosamente.");
-                  router.push("/dashboard/listado-empleados");
-                }
-              } catch (error) {
-                console.error("Error al eliminar empleado:", error);
-              }
-            }
-          }}>Eliminar</button>
+        <button onClick={() => router.push(`/dashboard/editar-empleado/${empleado.id}`)}>Editar</button>
+        <button onClick={handleDelete}>Eliminar</button>
       </div>
     </div>
   );
