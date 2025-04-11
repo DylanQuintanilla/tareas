@@ -77,8 +77,8 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
       const payload = {
         idDepartamento: Number(contratacion.idDepartamento),
         idEmpleado: Number(contratacion.idEmpleado),
-        idCargo: Number(contratacion.idCargo), // Ensure idCargo is a valid number
-        idTipoContratacion: Number(contratacion.idTipoContratacion), // Ensure idTipoContratacion is a valid number
+        idCargo: Number(contratacion.idCargo),
+        idTipoContratacion: Number(contratacion.idTipoContratacion),
         fechaContratacion: contratacion.fechaContratacion,
         salario: Number(contratacion.salario),
         estado: contratacion.estado,

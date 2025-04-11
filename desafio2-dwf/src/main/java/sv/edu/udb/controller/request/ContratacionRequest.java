@@ -27,10 +27,10 @@ public class ContratacionRequest {
     @NotNull(message = "El ID del empleado es requerido")
     private Long idEmpleado;
 
-    @NotNull(message = "El ID del cargo es requerido") // Ensure validation for idCargo
+    @NotNull(message = "El ID del cargo es requerido")
     private Long idCargo;
 
-    @NotNull(message = "El ID del tipo de contratación es requerido") // Ensure validation for idTipoContratacion
+    @NotNull(message = "El ID del tipo de contratación es requerido")
     private Long idTipoContratacion;
 
     @NotNull(message = "La fecha de contratación es requerida")
