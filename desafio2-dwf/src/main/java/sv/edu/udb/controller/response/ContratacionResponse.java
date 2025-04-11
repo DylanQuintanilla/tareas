@@ -22,17 +22,4 @@ public class ContratacionResponse {
     private Long idDepartamento;
     private Long idCargo;
     private Long idTipoContratacion;
-
-    @Override
-    public String toString() {
-        return "ContratacionResponse{" +
-                "fechaContratacion=" + fechaContratacion +
-                ", salario=" + salario +
-                ", estado=" + estado +
-                ", idEmpleado=" + idEmpleado +
-                ", idDepartamento=" + idDepartamento +
-                ", idCargo=" + idCargo +
-                ", idTipoContratacion=" + idTipoContratacion +
-                '}';
-    }
 }

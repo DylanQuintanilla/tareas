@@ -19,17 +19,4 @@ public class EmpleadoResponse {
     private String numeroTelefono;
     private String correoInstitucional;
     private LocalDate fechaNacimiento;
-
-    @Override
-    public String toString() {
-        return "EmpleadoResponse{" +
-                "idEmpleado=" + idEmpleado +
-                ", nombrePersona='" + nombrePersona + '\'' +
-                ", usuario='" + usuario + '\'' +
-                ", numeroDUI='" + numeroDUI + '\'' +
-                ", numeroTelefono='" + numeroTelefono + '\'' +
-                ", correoInstitucional='" + correoInstitucional + '\'' +
-                ", fechaNacimiento='" + fechaNacimiento + '\'' +
-                '}';
-    }
 }
