@@ -1,284 +1,180 @@
-"use client";
+import React, { useState, useEffect } from 'react';
+import { obtenerCargos } from '../service/CargosServices';
+import { obtenerTiposContratacion } from '../service/TipoContratacion';
+import { obtenerDepartamentos } from '../service/DepartamentoService';
+import { obtenerEmpleados } from '../service/EmpleadoService';
 
-import React, { useState, useEffect } from "react";
-import {
-  createContratacion,
-  updateContratacion,
-} from "@/service/ContratacioneService";
-import { getDepartamentos } from "@/service/DepartamentoService";
-import { getCargos } from "@/service/CargosServices";
-import { getTiposContratacion } from "@/service/TipoContratacion";
-import { getEmpleados } from "@/service/EmpleadoService";
+const FormularioContratacion = () => {
+  const [idCargo, setIdCargo] = useState(null);
+  const [idTipoContratacion, setIdTipoContratacion] = useState(null);
+  const [idDepartamento, setIdDepartamento] = useState(1);
+  const [idEmpleado, setIdEmpleado] = useState(1);
+  const [salario, setSalario] = useState('');
+  const [fechaContratacion, setFechaContratacion] = useState('2025-04-21');
+  const [estado, setEstado] = useState(true);
 
-const ContratacionFormulario = ({
-  contratacionInicial = null,
-  onSave,
-  isLoading = false,
-}) => {
-  const [contratacion, setContratacion] = useState({
-    id: null,
-    departamento: "",
-    empleado: "",
-    cargo: "",
-    tipoContratacion: "",
-    fechaContratacion: "",
-    salario: "",
-    estado: "true",
-  });
-  const [departamentos, setDepartamentos] = useState([]);
-  const [empleados, setEmpleados] = useState([]);
   const [cargos, setCargos] = useState([]);
   const [tiposContratacion, setTiposContratacion] = useState([]);
-  const [error, setError] = useState("");
+  const [departamentos, setDepartamentos] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
 
-  // Precarga para edición
   useEffect(() => {
-    if (contratacionInicial) {
-      setContratacion({
-        id: contratacionInicial.id,
-        departamento: contratacionInicial.idDepartamento?.toString() || "",
-        empleado: contratacionInicial.idEmpleado?.toString() || "",
-        cargo: contratacionInicial.idCargo?.toString() || "",
-        tipoContratacion:
-          contratacionInicial.idTipoContratacion?.toString() || "",
-        fechaContratacion:
-          contratacionInicial.fechaContratacion?.split("T")[0] || "",
-        salario: String(contratacionInicial.salario || ""),
-        estado: contratacionInicial.estado?.toString() || "true",
-      });
-    }
-  }, [contratacionInicial]);
-
-  // Carga listas para selects
-  useEffect(() => {
-    (async () => {
+    const fetchData = async () => {
       try {
-        const [
-          departamentosData,
-          empleadosData,
-          cargosData,
-          tiposData,
-        ] = await Promise.all([
-          getDepartamentos(),
-          getEmpleados(),
-          getCargos(),
-          getTiposContratacion(),
-        ]);
+        const cargosData = await obtenerCargos();
+        const tiposContratacionData = await obtenerTiposContratacion();
+        const departamentosData = await obtenerDepartamentos();
+        const empleadosData = await obtenerEmpleados();
+
+        setCargos(cargosData);
+        setTiposContratacion(tiposContratacionData);
         setDepartamentos(departamentosData);
         setEmpleados(empleadosData);
-        setCargos(cargosData);
-        setTiposContratacion(tiposData);
-      } catch (e) {
-        console.error("Error al cargar datos:", e);
-        setError("No se pudieron cargar los datos del formulario.");
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
-    })();
-  }, []);
+    };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setContratacion((prev) => ({ ...prev, [name]: value }));
-  };
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
-    // Convertimos todos los IDs a número
     const payload = {
-      idDepartamento:     Number(contratacion.departamento),
-      idEmpleado:         Number(contratacion.empleado),
-      idCargo:            Number(contratacion.cargo),
-      idTipoContratacion: Number(contratacion.tipoContratacion),
-      fechaContratacion:  contratacion.fechaContratacion,
-      salario:            Number(contratacion.salario),
-      estado:             contratacion.estado === "true",
+      idDepartamento,
+      idEmpleado,
+      idCargo,
+      idTipoContratacion,
+      fechaContratacion,
+      estado,
+      salario,
     };
 
-    // Debug: ver en consola qué valores obtenemos
-    console.log("▶️ Payload a enviar:", payload);
-
-    // Validación: cada campo ID debe ser un número válido > 0
-    const invalidId =
-      isNaN(payload.idDepartamento) || payload.idDepartamento <= 0 ||
-      isNaN(payload.idEmpleado)     || payload.idEmpleado     <= 0 ||
-      isNaN(payload.idCargo)        || payload.idCargo        <= 0 ||
-      isNaN(payload.idTipoContratacion) || payload.idTipoContratacion <= 0;
-
-    if (invalidId) {
-      setError("Por favor, selecciona todos los campos obligatorios.");
-      return;
-    }
+    console.log('Payload a enviar:', payload);
 
     try {
-      if (contratacion.id) {
-        await updateContratacion(contratacion.id, payload);
-      } else {
-        await createContratacion(payload);
+      const response = await fetch('http://localhost:8080/contrataciones', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al guardar la contratación: ${response.status} ${response.statusText}`);
       }
-      onSave();
-    } catch (err) {
-      console.error("Error al guardar contratación:", err);
-      setError(
-        err.response?.data?.message ||
-        "Error al procesar la solicitud de contratación"
-      );
+
+      const data = await response.json();
+      console.log('Contratación guardada exitosamente:', data);
+      alert('Contratación guardada exitosamente.');
+    } catch (error) {
+      console.error('Error al guardar la contratación:', error.message);
+      alert('Error al guardar la contratación.');
     }
   };
 
   return (
-    <div className="form-container">
-      {error && <p className="error">{error}</p>}
-      <form onSubmit={handleSubmit}>
-        {/* Departamento / Empleado */}
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="departamento">Departamento</label>
-            <select
-              id="departamento"
-              name="departamento"
-              value={contratacion.departamento}
-              onChange={handleChange}
-              required
-            >
-              <option key="default-dep" value="">
-                Seleccione un departamento
-              </option>
-              {departamentos.map((dep) => (
-                <option key={`dep-${dep.id}`} value={dep.id}>
-                  {dep.nombreDepartamento}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group">
-            <label htmlFor="empleado">Empleado</label>
-            <select
-              id="empleado"
-              name="empleado"
-              value={contratacion.empleado}
-              onChange={handleChange}
-              required
-            >
-              <option key="default-emp" value="">
-                Seleccione un empleado
-              </option>
-              {empleados.map((emp) => (
-                <option key={`emp-${emp.id}`} value={emp.id}>
-                  {emp.nombrePersona} ({emp.usuario})
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Cargo / Tipo Contratación */}
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="cargo">Cargo</label>
-            <select
-              id="cargo"
-              name="cargo"
-              value={contratacion.cargo}
-              onChange={handleChange}
-              required
-            >
-              <option key="default-cargo" value="">
-                Seleccione un cargo
-              </option>
-              {cargos.map((c) => (
-                <option key={`cargo-${c.id}`} value={c.id}>
-                  {c.cargo}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="form-group">
-            <label htmlFor="tipoContratacion">
-              Tipo de Contratación
-            </label>
-            <select
-              id="tipoContratacion"
-              name="tipoContratacion"
-              value={contratacion.tipoContratacion}
-              onChange={handleChange}
-              required
-            >
-              <option key="default-tipo" value="">
-                Seleccione un tipo
-              </option>
-              {tiposContratacion.map((t) => (
-                <option key={`tipo-${t.id}`} value={t.id}>
-                  {t.tipoContratacion}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Fecha / Salario */}
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="fechaContratacion">
-              Fecha de Contratación
-            </label>
-            <input
-              type="date"
-              id="fechaContratacion"
-              name="fechaContratacion"
-              value={contratacion.fechaContratacion}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="salario">Salario</label>
-            <input
-              type="number"
-              id="salario"
-              name="salario"
-              step="0.01"
-              min="0"
-              placeholder="Ej. 1500.50"
-              value={contratacion.salario}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        </div>
-
-        {/* Estado */}
-        <div className="form-group">
-          <label htmlFor="estado">Estado</label>
-          <select
-            id="estado"
-            name="estado"
-            value={contratacion.estado}
-            onChange={handleChange}
-            required
-          >
-            <option key="estado-true" value="true">
-              Activo
+    <form onSubmit={handleSubmit}>
+      <div>
+        <label htmlFor="cargo">Cargo</label>
+        <select
+          id="cargo"
+          value={idCargo || ''}
+          onChange={(e) => setIdCargo(e.target.value)}
+        >
+          <option value="">Seleccione un cargo</option>
+          {cargos.map((cargo) => (
+            <option key={cargo.idCargo} value={cargo.idCargo}>
+              {cargo.cargo}
             </option>
-            <option key="estado-false" value="false">
-              Inactivo
-            </option>
-          </select>
-        </div>
+          ))}
+        </select>
+      </div>
 
-        {/* Botón */}
-        <div className="button-group">
-          <button type="submit" disabled={isLoading}>
-            {isLoading
-              ? "Guardando..."
-              : contratacion.id
-              ? "Actualizar"
-              : "Crear"}
-          </button>
-        </div>
-      </form>
-    </div>
+      <div>
+        <label htmlFor="tipoContratacion">Tipo de Contratación</label>
+        <select
+          id="tipoContratacion"
+          value={idTipoContratacion || ''}
+          onChange={(e) => setIdTipoContratacion(e.target.value)}
+        >
+          <option value="">Seleccione un tipo de contratación</option>
+          {tiposContratacion.map((tipo) => (
+            <option key={tipo.idTipoContratacion} value={tipo.idTipoContratacion}>
+              {tipo.tipoContratacion}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="departamento">Departamento</label>
+        <select
+          id="departamento"
+          value={idDepartamento || ''}
+          onChange={(e) => setIdDepartamento(e.target.value)}
+        >
+          <option value="">Seleccione un departamento</option>
+          {departamentos.map((departamento) => (
+            <option key={departamento.idDepartamento} value={departamento.idDepartamento}>
+              {departamento.nombreDepartamento}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="empleado">Empleado</label>
+        <select
+          id="empleado"
+          value={idEmpleado || ''}
+          onChange={(e) => setIdEmpleado(e.target.value)}
+        >
+          <option value="">Seleccione un empleado</option>
+          {empleados.map((empleado) => (
+            <option key={empleado.idEmpleado} value={empleado.idEmpleado}>
+              {empleado.nombrePersona}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="salario">Salario</label>
+        <input
+          type="number"
+          id="salario"
+          value={salario}
+          onChange={(e) => setSalario(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="fechaContratacion">Fecha de Contratación</label>
+        <input
+          type="date"
+          id="fechaContratacion"
+          value={fechaContratacion}
+          onChange={(e) => setFechaContratacion(e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="estado">Estado</label>
+        <select
+          id="estado"
+          value={estado}
+          onChange={(e) => setEstado(e.target.value === 'true')}
+        >
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+      </div>
+      <button type="submit">Enviar</button>
+    </form>
   );
 };
 
-export default ContratacionFormulario;
+export default FormularioContratacion;

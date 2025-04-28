@@ -1,6 +1,7 @@
 const API_URL = "http://localhost:8080/departamentos";
 
-export const getDepartamentos = async () => {
+// Add an alias export for obtenerDepartamentos
+export const obtenerDepartamentos = async () => {
   try {
     const response = await fetch(API_URL, {
       method: "GET",
@@ -24,6 +25,8 @@ export const getDepartamentos = async () => {
     return [];
   }
 };
+
+export const getDepartamentos = obtenerDepartamentos;
 
 export const getDepartamentoById = async (id) => {
   try {

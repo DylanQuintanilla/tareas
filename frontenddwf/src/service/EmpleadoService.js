@@ -1,7 +1,7 @@
-const API_URL = "http://localhost:8080/empleados"; // Updated API base URL
+const API_URL = "http://localhost:8080/empleados";
 
 // Obtener la lista de empleados.
-export const getEmpleados = async () => {
+export const obtenerEmpleados = async () => {
   try {
     const response = await fetch(API_URL, {
       method: "GET",
@@ -14,14 +14,7 @@ export const getEmpleados = async () => {
 
     const data = await response.json();
     console.log("Datos de empleados:", data);
-
-    // Mapea para que cada empleado tenga "id" asignado a "idEmpleado"
-    const empleadosConId = data.map(emp => ({
-      ...emp,
-      id: emp.idEmpleado  // Aquí mapeamos directamente
-    }));
-
-    return empleadosConId;
+    return data;
   } catch (error) {
     console.error("Error al obtener empleados:", error.message);
     return [];
@@ -29,9 +22,8 @@ export const getEmpleados = async () => {
 };
 
 
-
-// Obtener un empleado por ID.
-export const getEmpleadoById = async (id) => {
+// Obtener un empleado por ID (nueva función).
+export const getEmpleado = async (id) => {
   try {
     if (!id) {
       throw new Error("El ID del empleado no fue proporcionado.");
@@ -50,14 +42,18 @@ export const getEmpleadoById = async (id) => {
 
     const data = await response.json();
     console.log("Empleado obtenido exitosamente:", data);
-
-    // Mapea el identificador
-    return { ...data, id: data.idEmpleado };
+    return data;
   } catch (error) {
     console.error("Error al obtener empleado:", error.message);
     return null;
   }
 };
+
+// Alias para getEmpleado (nueva función).
+export const obtenerEmpleado = getEmpleado;
+
+// Export getEmpleados for consistency
+export const getEmpleados = obtenerEmpleados;
 
 
 // Crear un nuevo empleado.

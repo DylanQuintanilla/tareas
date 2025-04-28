@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EmpleadoCard from "@/components/EmpleadoCard";
-import { getEmpleados } from "@/service/EmpleadoService";
+import { getEmpleados } from "@/service/EmpleadoService"; // Use getEmpleados consistently
 
 const ListadoEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -14,7 +14,7 @@ const ListadoEmpleados = () => {
     const fetchEmpleados = async () => {
       setIsLoading(true);
       try {
-        const data = await getEmpleados();
+        const data = await getEmpleados(); // Use getEmpleados here
         console.log("Empleados obtenidos:", data); // Debugging: Log the fetched data
         setEmpleados(data);
       } catch (err) {

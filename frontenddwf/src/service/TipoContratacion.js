@@ -1,6 +1,6 @@
 const API_URL = "http://localhost:8080/tipos-contratacion";
 
-export const getTiposContratacion = async () => {
+export const obtenerTiposContratacion = async () => {
   try {
     const response = await fetch(API_URL, {
       method: "GET",
@@ -100,3 +100,5 @@ export const deleteTipoContratacion = async (id) => {
     return false;
   }
 };
+
+export const getTiposContratacion = obtenerTiposContratacion;

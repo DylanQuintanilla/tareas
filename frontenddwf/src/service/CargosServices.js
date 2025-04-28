@@ -1,6 +1,6 @@
 const API_URL = "http://localhost:8080/cargos";
 
-export const getCargos = async () => {
+export const obtenerCargos = async () => {
   try {
     const response = await fetch(API_URL, {
       method: "GET",
@@ -100,3 +100,5 @@ export const deleteCargo = async (id) => {
     return false;
   }
 };
+
+export const getCargos = obtenerCargos;
