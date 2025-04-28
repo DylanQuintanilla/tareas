@@ -28,7 +28,7 @@ import lombok.Setter;
 @Table(name = "cargos")
 public class Cargo {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //Probar con SEQUENCY
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idCargo", nullable = false)
     private Long id;
 
@@ -42,8 +42,7 @@ public class Cargo {
     @Column(name = "jefatura")
     private Boolean jefatura;
 
-    @JsonIgnore // Ignora relaciones perezosas
-    @OneToMany(mappedBy = "idCargo", fetch = FetchType.LAZY)
+    @JsonIgnore
+    @OneToMany(mappedBy = "cargo", fetch = FetchType.LAZY) // Corrected mappedBy to match the variable name in Contratacion
     private List<Contratacion> contrataciones;
-
 }

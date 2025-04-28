@@ -1,5 +1,6 @@
-const API_URL = "http://localhost:8080/contrataciones"; // Base URL for Contratación API
+const API_URL = "http://localhost:8080/contrataciones";
 
+// Obtener todas las contrataciones
 export const getContrataciones = async () => {
   try {
     const response = await fetch(API_URL, {
@@ -20,6 +21,7 @@ export const getContrataciones = async () => {
   }
 };
 
+// Obtener una contratación por ID
 export const getContratacionById = async (id) => {
   try {
     if (!id) {
@@ -32,13 +34,11 @@ export const getContratacionById = async (id) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Error en la respuesta:", errorData.message);
-      throw new Error(errorData.message || `Error al obtener contratación: ${response.status}`);
+      throw new Error(`Error al obtener contratación: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log("Contratación obtenida exitosamente:", data);
+    console.log("Contratación obtenida:", data);
     return data;
   } catch (error) {
     console.error("Error al obtener contratación:", error.message);
@@ -46,6 +46,7 @@ export const getContratacionById = async (id) => {
   }
 };
 
+// Crear una nueva contratación
 export const createContratacion = async (contratacion) => {
   try {
     const response = await fetch(API_URL, {
@@ -55,9 +56,7 @@ export const createContratacion = async (contratacion) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Error en la respuesta:", errorData.message);
-      throw new Error(errorData.message || `Error al crear contratación: ${response.status}`);
+      throw new Error(`Error al crear contratación: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -69,8 +68,13 @@ export const createContratacion = async (contratacion) => {
   }
 };
 
+// Actualizar una contratación existente
 export const updateContratacion = async (id, contratacion) => {
   try {
+    if (!id) {
+      throw new Error("El ID de la contratación no fue proporcionado.");
+    }
+
     const response = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -78,9 +82,7 @@ export const updateContratacion = async (id, contratacion) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Error en la respuesta:", errorData.message);
-      throw new Error(errorData.message || `Error al actualizar contratación: ${response.status}`);
+      throw new Error(`Error al actualizar contratación: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -92,6 +94,7 @@ export const updateContratacion = async (id, contratacion) => {
   }
 };
 
+// Eliminar una contratación
 export const deleteContratacion = async (id) => {
   try {
     if (!id) {

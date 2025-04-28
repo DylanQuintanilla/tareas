@@ -16,58 +16,65 @@ import sv.edu.udb.repository.TipoContratacionRepository;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(
+        componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
 public abstract class ContratacionMapper {
 
-    @Autowired
-    protected DepartamentoRepository departamentoRepository;
-
-    @Autowired
-    protected EmpleadoRepository empleadoRepository;
-
-    @Autowired
-    protected CargoRepository cargoRepository;
-
-    @Autowired
-    protected TipoContratacionRepository tipocontratacionRepository;
+    @Autowired protected DepartamentoRepository departamentoRepository;
+    @Autowired protected EmpleadoRepository    empleadoRepository;
+    @Autowired protected CargoRepository       cargoRepository;
+    @Autowired protected TipoContratacionRepository tipoContratacionRepository;
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "idDepartamento", expression = "java(findDepartamento(request.getIdDepartamento()))")
-    @Mapping(target = "empleado", expression = "java(findEmpleado(request.getIdEmpleado()))")
-    @Mapping(target = "idCargo", expression = "java(findCargo(request.getIdCargo()))")
-    @Mapping(target = "idTipoContratacion", expression = "java(findTipoContratacion(request.getIdTipoContratacion()))")
+    @Mapping(target = "departamento",
+            expression = "java(referenceDepartamento(request.getIdDepartamento()))")
+    @Mapping(target = "empleado",
+            expression = "java(referenceEmpleado(request.getIdEmpleado()))")
+    @Mapping(target = "cargo",
+            expression = "java(referenceCargo(request.getIdCargo()))")
+    @Mapping(target = "tipoContratacion",
+            expression = "java(referenceTipoContratacion(request.getIdTipoContratacion()))")
     public abstract Contratacion toEntity(ContratacionRequest request);
 
-    @Mapping(target = "idEmpleado", source = "empleado.id")
-    @Mapping(target = "idDepartamento", source = "idDepartamento.id")
-    @Mapping(target = "idCargo", source = "idCargo.id")
-    @Mapping(target = "idTipoContratacion", source = "idTipoContratacion.id")
+    @Mapping(target = "idDepartamento", source = "departamento.id")
+    @Mapping(target = "idEmpleado",    source = "empleado.id")
+    @Mapping(target = "idCargo",       source = "cargo.id")
+    @Mapping(target = "idTipoContratacion", source = "tipoContratacion.id")
     public abstract ContratacionResponse toResponse(Contratacion contratacion);
 
     public abstract List<ContratacionResponse> toResponseList(List<Contratacion> contrataciones);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "idDepartamento", expression = "java(findDepartamento(request.getIdDepartamento()))")
-    @Mapping(target = "empleado", expression = "java(findEmpleado(request.getIdEmpleado()))")
-    @Mapping(target = "idCargo", expression = "java(findCargo(request.getIdCargo()))")
-    @Mapping(target = "idTipoContratacion", expression = "java(findTipoContratacion(request.getIdTipoContratacion()))")
-    public abstract void updateEntityFromRequest(ContratacionRequest request, @MappingTarget Contratacion contratacion);
+    @Mapping(target = "departamento",
+            expression = "java(referenceDepartamento(request.getIdDepartamento()))")
+    @Mapping(target = "empleado",
+            expression = "java(referenceEmpleado(request.getIdEmpleado()))")
+    @Mapping(target = "cargo",
+            expression = "java(referenceCargo(request.getIdCargo()))")
+    @Mapping(target = "tipoContratacion",
+            expression = "java(referenceTipoContratacion(request.getIdTipoContratacion()))")
+    public abstract void updateEntityFromRequest(
+            ContratacionRequest request,
+            @MappingTarget Contratacion contratacion
+    );
 
-    // Métodos auxiliares para convertir IDs a entidades
-    protected Departamento findDepartamento(Long id) {
-        return id != null ? departamentoRepository.findById(id).orElse(null) : null;
+    // proxies sin cargar entidades completas
+    protected Departamento referenceDepartamento(Long id) {
+        return id != null ? departamentoRepository.getReferenceById(id) : null;
     }
-
-    protected Empleado findEmpleado(Long id) {
-        return id != null ? empleadoRepository.findById(id).orElse(null) : null;
+    protected Empleado referenceEmpleado(Long id) {
+        return id != null ? empleadoRepository.getReferenceById(id) : null;
     }
-
-    protected Cargo findCargo(Long id) {
-        return id != null ? cargoRepository.findById(id).orElse(null) : null;
+    protected Cargo referenceCargo(Long id) {
+        return id != null ? cargoRepository.getReferenceById(id) : null;
     }
-
-    protected Tipocontratacion findTipoContratacion(Long id) {
-        return id != null ? tipocontratacionRepository.findById(id).orElse(null) : null;
+    protected Tipocontratacion referenceTipoContratacion(Long id) {
+        return id != null
+                ? tipoContratacionRepository.getReferenceById(id)
+                : null;
     }
 }
+

@@ -2,38 +2,38 @@ package sv.edu.udb.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "contrataciones")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Contratacion {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idContratacion", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idDepartamento")
-    private Departamento idDepartamento;
+    @JoinColumn(name = "idDepartamento", nullable = false)
+    private Departamento departamento;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idEmpleado")
+    @JoinColumn(name = "idEmpleado", nullable = false)
     private Empleado empleado;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idCargo")
-    private Cargo idCargo;
+    @JoinColumn(name = "idCargo", nullable = false)
+    private Cargo cargo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idTipoContratacion")
-    private Tipocontratacion idTipoContratacion;
+    @JoinColumn(name = "idTipoContratacion", nullable = false)
+    private Tipocontratacion tipoContratacion;
 
     @Column(name = "fechaContratacion")
     private LocalDate fechaContratacion;

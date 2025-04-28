@@ -3,21 +3,32 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { deleteContratacion } from "@/service/ContratacioneService";
 
-export default function ContratacionCard({ contratacion, onDelete }) {
+export default function ContratacionCard({
+  id, // Ensure the ID is passed correctly
+  nombreDepartamento,
+  nombreEmpleado,
+  nombreCargo,
+  nombreTipoContratacion,
+  fechaContratacion,
+  salario,
+  estado,
+  onDelete,
+}) {
   const router = useRouter();
 
   const handleDelete = async () => {
-    if (!contratacion.id) {
-      console.error("El ID de la contratación es undefined o no válido:", contratacion);
+    if (!id) {
+      console.error("El ID de la contratación es undefined o no válido.");
+      alert("No se puede eliminar esta contratación porque el ID no es válido.");
       return;
     }
-
+  
     if (confirm("¿Estás seguro de eliminar esta contratación?")) {
       try {
-        const success = await deleteContratacion(contratacion.id);
+        const success = await deleteContratacion(id);
         if (success) {
           alert("Contratación eliminada exitosamente.");
-          onDelete(contratacion.id); // Notify parent to update the list
+          onDelete(id); // <--- Aquí debes PASAR el ID
         }
       } catch (error) {
         console.error("Error al eliminar contratación:", error);
@@ -25,20 +36,19 @@ export default function ContratacionCard({ contratacion, onDelete }) {
       }
     }
   };
+  
 
   return (
     <div className="card">
-      <h3>Contratación ID: {contratacion.id}</h3>
-      <p><strong>Empleado:</strong> {contratacion.idEmpleado}</p>
-      <p><strong>Departamento:</strong> {contratacion.idDepartamento}</p>
-      <p><strong>Cargo:</strong> {contratacion.idCargo}</p>
-      <p><strong>Tipo de Contratación:</strong> {contratacion.idTipoContratacion}</p>
-      <p><strong>Fecha de Contratación:</strong> {contratacion.fechaContratacion}</p>
-      <p><strong>Salario:</strong> ${contratacion.salario}</p>
-      <p><strong>Estado:</strong> {contratacion.estado ? "Activo" : "Inactivo"}</p>
+      <h3>Contratación</h3>
+      <p><strong>Departamento:</strong> {nombreDepartamento || "No disponible"}</p>
+      <p><strong>Empleado:</strong> {nombreEmpleado || "No disponible"}</p>
+      <p><strong>Cargo:</strong> {nombreCargo || "No disponible"}</p>
+      <p><strong>Tipo de Contratación:</strong> {nombreTipoContratacion || "No disponible"}</p>
+      <p><strong>Fecha de Contratación:</strong> {fechaContratacion || "No disponible"}</p>
+      <p><strong>Salario:</strong> ${salario || "No disponible"}</p>
+      <p><strong>Estado:</strong> {estado ? "Activo" : "Inactivo"}</p>
       <div className="button-group">
-        <button onClick={() => router.push(`/dashboard/ver-contratacion/${contratacion.id}`)}>Ver</button>
-        <button onClick={() => router.push(`/dashboard/editar-contratacion/${contratacion.id}`)}>Editar</button>
         <button onClick={handleDelete}>Eliminar</button>
       </div>
     </div>

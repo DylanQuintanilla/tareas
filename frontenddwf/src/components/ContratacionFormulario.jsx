@@ -1,113 +1,116 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import { createContratacion, updateContratacion } from "@/service/ContratacioneService";
+import {
+  createContratacion,
+  updateContratacion,
+} from "@/service/ContratacioneService";
 import { getDepartamentos } from "@/service/DepartamentoService";
 import { getCargos } from "@/service/CargosServices";
 import { getTiposContratacion } from "@/service/TipoContratacion";
 import { getEmpleados } from "@/service/EmpleadoService";
 
-const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading = false }) => {
+const ContratacionFormulario = ({
+  contratacionInicial = null,
+  onSave,
+  isLoading = false,
+}) => {
   const [contratacion, setContratacion] = useState({
-    idDepartamento: "",
-    idEmpleado: "",
-    idCargo: "",
-    idTipoContratacion: "",
+    id: null,
+    departamento: "",
+    empleado: "",
+    cargo: "",
+    tipoContratacion: "",
     fechaContratacion: "",
     salario: "",
-    estado: true,
+    estado: "true",
   });
-
   const [departamentos, setDepartamentos] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [cargos, setCargos] = useState([]);
   const [tiposContratacion, setTiposContratacion] = useState([]);
   const [error, setError] = useState("");
 
-  // Cargar datos iniciales con conversión segura
+  // Precarga para edición
   useEffect(() => {
     if (contratacionInicial) {
       setContratacion({
-        idDepartamento: String(contratacionInicial.idDepartamento || ""),
-        idEmpleado: String(contratacionInicial.idEmpleado || ""),
-        idCargo: String(contratacionInicial.idCargo || ""),
-        idTipoContratacion: String(contratacionInicial.idTipoContratacion || ""),
-        fechaContratacion: contratacionInicial.fechaContratacion?.split('T')[0] || "",
+        id: contratacionInicial.id,
+        departamento: contratacionInicial.idDepartamento?.toString() || "",
+        empleado: contratacionInicial.idEmpleado?.toString() || "",
+        cargo: contratacionInicial.idCargo?.toString() || "",
+        tipoContratacion:
+          contratacionInicial.idTipoContratacion?.toString() || "",
+        fechaContratacion:
+          contratacionInicial.fechaContratacion?.split("T")[0] || "",
         salario: String(contratacionInicial.salario || ""),
-        estado: contratacionInicial.estado
+        estado: contratacionInicial.estado?.toString() || "true",
       });
     }
   }, [contratacionInicial]);
 
-  // Cargar datos de selects
+  // Carga listas para selects
   useEffect(() => {
-    const fetchData = async () => {
+    (async () => {
       try {
-        const [departamentosData, empleadosData, cargosData, tiposContratacionData] = await Promise.all([
+        const [
+          departamentosData,
+          empleadosData,
+          cargosData,
+          tiposData,
+        ] = await Promise.all([
           getDepartamentos(),
           getEmpleados(),
           getCargos(),
           getTiposContratacion(),
         ]);
-
-        // Normalizar IDs a números
-        setCargos(cargosData.map(c => ({ ...c, id: Number(c.id) })));
-        setDepartamentos(departamentosData.map(d => ({ ...d, id: Number(d.id) })));
-        setEmpleados(empleadosData.map(e => ({ ...e, id: Number(e.id) })));
-        setTiposContratacion(tiposContratacionData.map(t => ({ ...t, id: Number(t.id) })));
-      } catch (err) {
-        console.error("Error al cargar datos:", err.message);
-        setError("Error al cargar datos para el formulario.");
+        setDepartamentos(departamentosData);
+        setEmpleados(empleadosData);
+        setCargos(cargosData);
+        setTiposContratacion(tiposData);
+      } catch (e) {
+        console.error("Error al cargar datos:", e);
+        setError("No se pudieron cargar los datos del formulario.");
       }
-    };
-    fetchData();
+    })();
   }, []);
 
-  // Función handleChange CORREGIDA
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setContratacion(prev => ({
-      ...prev,
-      [name]: name === "estado" ? value === "true" : value
-    }));
-  };
-
-  // Validación de campos numéricos
-  const validarCampos = () => {
-    const camposNumericos = [
-      'idDepartamento',
-      'idEmpleado',
-      'idCargo',
-      'idTipoContratacion',
-      'salario'
-    ];
-
-    return camposNumericos.every(campo => {
-      const valor = contratacion[campo];
-      return valor !== "" && !isNaN(valor) && Number(valor) > 0;
-    });
+    setContratacion((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!validarCampos()) {
-      setError("Todos los campos numéricos deben tener valores válidos");
+    // Convertimos todos los IDs a número
+    const payload = {
+      idDepartamento:     Number(contratacion.departamento),
+      idEmpleado:         Number(contratacion.empleado),
+      idCargo:            Number(contratacion.cargo),
+      idTipoContratacion: Number(contratacion.tipoContratacion),
+      fechaContratacion:  contratacion.fechaContratacion,
+      salario:            Number(contratacion.salario),
+      estado:             contratacion.estado === "true",
+    };
+
+    // Debug: ver en consola qué valores obtenemos
+    console.log("▶️ Payload a enviar:", payload);
+
+    // Validación: cada campo ID debe ser un número válido > 0
+    const invalidId =
+      isNaN(payload.idDepartamento) || payload.idDepartamento <= 0 ||
+      isNaN(payload.idEmpleado)     || payload.idEmpleado     <= 0 ||
+      isNaN(payload.idCargo)        || payload.idCargo        <= 0 ||
+      isNaN(payload.idTipoContratacion) || payload.idTipoContratacion <= 0;
+
+    if (invalidId) {
+      setError("Por favor, selecciona todos los campos obligatorios.");
       return;
     }
 
     try {
-      // Crear payload con valores numéricos
-      const payload = {
-        idDepartamento: Number(contratacion.idDepartamento),
-        idEmpleado: Number(contratacion.idEmpleado),
-        idCargo: Number(contratacion.idCargo),
-        idTipoContratacion: Number(contratacion.idTipoContratacion),
-        fechaContratacion: contratacion.fechaContratacion,
-        salario: Number(contratacion.salario),
-        estado: contratacion.estado
-      };
-
       if (contratacion.id) {
         await updateContratacion(contratacion.id, payload);
       } else {
@@ -115,8 +118,11 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
       }
       onSave();
     } catch (err) {
-      console.error("Error al guardar contratación:", err.message);
-      setError(err.response?.data?.message || "Error al procesar la solicitud");
+      console.error("Error al guardar contratación:", err);
+      setError(
+        err.response?.data?.message ||
+        "Error al procesar la solicitud de contratación"
+      );
     }
   };
 
@@ -124,18 +130,20 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
     <div className="form-container">
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit}>
+        {/* Departamento / Empleado */}
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="idDepartamento">Departamento</label>
+            <label htmlFor="departamento">Departamento</label>
             <select
-              id="idDepartamento"
-              name="idDepartamento"
-              value={contratacion.idDepartamento}
+              id="departamento"
+              name="departamento"
+              value={contratacion.departamento}
               onChange={handleChange}
               required
-              className="form-control styled-select"
             >
-              <option value="">Seleccione un departamento</option>
+              <option key="default-dep" value="">
+                Seleccione un departamento
+              </option>
               {departamentos.map((dep) => (
                 <option key={`dep-${dep.id}`} value={dep.id}>
                   {dep.nombreDepartamento}
@@ -143,18 +151,18 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
               ))}
             </select>
           </div>
-
           <div className="form-group">
-            <label htmlFor="idEmpleado">Empleado</label>
+            <label htmlFor="empleado">Empleado</label>
             <select
-              id="idEmpleado"
-              name="idEmpleado"
-              value={contratacion.idEmpleado}
+              id="empleado"
+              name="empleado"
+              value={contratacion.empleado}
               onChange={handleChange}
               required
-              className="form-control styled-select"
             >
-              <option value="">Seleccione un empleado</option>
+              <option key="default-emp" value="">
+                Seleccione un empleado
+              </option>
               {empleados.map((emp) => (
                 <option key={`emp-${emp.id}`} value={emp.id}>
                   {emp.nombrePersona} ({emp.usuario})
@@ -164,49 +172,56 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
           </div>
         </div>
 
+        {/* Cargo / Tipo Contratación */}
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="idCargo">Cargo</label>
+            <label htmlFor="cargo">Cargo</label>
             <select
-              id="idCargo"
-              name="idCargo"
-              value={contratacion.idCargo}
+              id="cargo"
+              name="cargo"
+              value={contratacion.cargo}
               onChange={handleChange}
               required
-              className="form-control styled-select"
             >
-              <option value="">Seleccione un cargo</option>
-              {cargos.map((cargo) => (
-                <option key={`cargo-${cargo.id}`} value={cargo.id}>
-                  {cargo.cargo}
+              <option key="default-cargo" value="">
+                Seleccione un cargo
+              </option>
+              {cargos.map((c) => (
+                <option key={`cargo-${c.id}`} value={c.id}>
+                  {c.cargo}
                 </option>
               ))}
             </select>
           </div>
-
           <div className="form-group">
-            <label htmlFor="idTipoContratacion">Tipo de Contratación</label>
+            <label htmlFor="tipoContratacion">
+              Tipo de Contratación
+            </label>
             <select
-              id="idTipoContratacion"
-              name="idTipoContratacion"
-              value={contratacion.idTipoContratacion}
+              id="tipoContratacion"
+              name="tipoContratacion"
+              value={contratacion.tipoContratacion}
               onChange={handleChange}
               required
-              className="form-control styled-select"
             >
-              <option value="">Seleccione un tipo</option>
-              {tiposContratacion.map((tipo) => (
-                <option key={`tipo-${tipo.id}`} value={tipo.id}>
-                  {tipo.tipoContratacion}
+              <option key="default-tipo" value="">
+                Seleccione un tipo
+              </option>
+              {tiposContratacion.map((t) => (
+                <option key={`tipo-${t.id}`} value={t.id}>
+                  {t.tipoContratacion}
                 </option>
               ))}
             </select>
           </div>
         </div>
 
+        {/* Fecha / Salario */}
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="fechaContratacion">Fecha de Contratación</label>
+            <label htmlFor="fechaContratacion">
+              Fecha de Contratación
+            </label>
             <input
               type="date"
               id="fechaContratacion"
@@ -214,10 +229,8 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
               value={contratacion.fechaContratacion}
               onChange={handleChange}
               required
-              className="form-control"
             />
           </div>
-
           <div className="form-group">
             <label htmlFor="salario">Salario</label>
             <input
@@ -230,29 +243,37 @@ const ContratacionFormulario = ({ contratacionInicial = null, onSave, isLoading 
               value={contratacion.salario}
               onChange={handleChange}
               required
-              className="form-control"
             />
           </div>
         </div>
 
+        {/* Estado */}
         <div className="form-group">
           <label htmlFor="estado">Estado</label>
           <select
             id="estado"
             name="estado"
-            value={contratacion.estado.toString()}
+            value={contratacion.estado}
             onChange={handleChange}
             required
-            className="form-control styled-select"
           >
-            <option value="true">Activo</option>
-            <option value="false">Inactivo</option>
+            <option key="estado-true" value="true">
+              Activo
+            </option>
+            <option key="estado-false" value="false">
+              Inactivo
+            </option>
           </select>
         </div>
 
+        {/* Botón */}
         <div className="button-group">
           <button type="submit" disabled={isLoading}>
-            {isLoading ? "Guardando..." : contratacion.id ? "Actualizar" : "Crear"}
+            {isLoading
+              ? "Guardando..."
+              : contratacion.id
+              ? "Actualizar"
+              : "Crear"}
           </button>
         </div>
       </form>

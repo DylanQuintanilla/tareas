@@ -1,36 +1,75 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContratacionCard from "@/components/ContratacionCard";
 import { getContrataciones } from "@/service/ContratacioneService";
+import { getDepartamentos } from "@/service/DepartamentoService";
+import { getEmpleados } from "@/service/EmpleadoService";
+import { getCargos } from "@/service/CargosServices";
+import { getTiposContratacion } from "@/service/TipoContratacion";
 
 const ListadoContrataciones = () => {
   const [contrataciones, setContrataciones] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);
+  const [empleados, setEmpleados] = useState([]);
+  const [cargos, setCargos] = useState([]);
+  const [tiposContratacion, setTiposContratacion] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchContrataciones = async () => {
+    const fetchAll = async () => {
       setIsLoading(true);
       try {
-        const data = await getContrataciones();
-        console.log("Contrataciones obtenidas:", data); // Debugging: Log the fetched data
-        setContrataciones(data);
-      } catch (err) {
-        console.error("Error fetching contrataciones:", err.message); // Debugging: Log the error
-        setError(err.message || "Error al obtener la lista de contrataciones.");
+        const [
+          contratacionesData,
+          departamentosData,
+          empleadosData,
+          cargosData,
+          tiposData,
+        ] = await Promise.all([
+          getContrataciones(),
+          getDepartamentos(),
+          getEmpleados(),
+          getCargos(),
+          getTiposContratacion(),
+        ]);
+
+        setContrataciones(contratacionesData);
+        setDepartamentos(departamentosData);
+        setEmpleados(empleadosData);
+        setCargos(cargosData);
+        setTiposContratacion(tiposData);
+      } catch (e) {
+        console.error("Error cargando datos:", e);
+        setError("No se pudieron cargar los datos.");
       } finally {
         setIsLoading(false);
       }
     };
-
-    fetchContrataciones();
+    fetchAll();
   }, []);
 
+  // Crear mapas de lookup para nombres
+  const departamentoMap = Object.fromEntries(
+    departamentos.map((d) => [d.idDepartamento, d.nombreDepartamento])
+  );
+  const empleadoMap = Object.fromEntries(
+    empleados.map((e) => [e.idEmpleado, e.nombrePersona])
+  );
+  const cargoMap = Object.fromEntries(
+    cargos.map((c) => [c.idCargo, c.cargo])
+  );
+  const tipoMap = Object.fromEntries(
+    tiposContratacion.map((t) => [t.idTipoContratacion, t.tipoContratacion])
+  );
+
   const handleDelete = (id) => {
-    setContrataciones((prevContrataciones) => prevContrataciones.filter((contratacion) => contratacion.id !== id));
+    setContrataciones((prev) => prev.filter((c) => c.id !== id));
   };
+  
 
   if (isLoading) {
     return (
@@ -63,11 +102,18 @@ const ListadoContrataciones = () => {
         <h2>Listado de Contrataciones</h2>
         <div className="card-container">
           {contrataciones.length > 0 ? (
-            contrataciones.map((contratacion) => (
+            contrataciones.map((c) => (
               <ContratacionCard
-                key={contratacion.id}
-                contratacion={contratacion}
-                onDelete={handleDelete}
+                key={c.id || `${c.idDepartamento}-${c.idEmpleado}-${c.idCargo}-${c.idTipoContratacion}-${c.fechaContratacion}`} // Ensure unique key
+                id={c.id} // Pass the correct ID
+                nombreDepartamento={departamentoMap[c.idDepartamento]}
+                nombreEmpleado={empleadoMap[c.idEmpleado]}
+                nombreCargo={cargoMap[c.idCargo]}
+                nombreTipoContratacion={tipoMap[c.idTipoContratacion]}
+                fechaContratacion={c.fechaContratacion}
+                salario={c.salario}
+                estado={c.estado}
+                onDelete={() => handleDelete(c.id)}
               />
             ))
           ) : (
