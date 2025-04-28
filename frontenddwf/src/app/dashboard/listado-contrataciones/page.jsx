@@ -66,16 +66,15 @@ const ListadoContrataciones = () => {
     tiposContratacion.map((t) => [t.idTipoContratacion, t.tipoContratacion])
   );
 
-  const handleDelete = (id) => {
-    setContrataciones((prev) => prev.filter((c) => c.id !== id));
+  const handleDelete = (idEliminado) => {
+    setContrataciones((prev) => prev.filter((c) => c.idContratacion !== idEliminado));
   };
-  
 
   if (isLoading) {
     return (
       <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Header />
-        <div className="container">
+        <div className="container my-5">
           <h2>Cargando contrataciones...</h2>
         </div>
         <Footer />
@@ -87,7 +86,7 @@ const ListadoContrataciones = () => {
     return (
       <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Header />
-        <div className="container">
+        <div className="container my-5">
           <h2>Error: {error}</h2>
         </div>
         <Footer />
@@ -104,8 +103,8 @@ const ListadoContrataciones = () => {
           {contrataciones.length > 0 ? (
             contrataciones.map((c) => (
               <ContratacionCard
-                key={c.id || `${c.idDepartamento}-${c.idEmpleado}-${c.idCargo}-${c.idTipoContratacion}-${c.fechaContratacion}`} // Ensure unique key
-                id={c.id} // Pass the correct ID
+                key={c.idContratacion || `${c.idDepartamento}-${c.idEmpleado}-${c.idCargo}-${c.idTipoContratacion}-${c.fechaContratacion}`}
+                id={c.idContratacion}
                 nombreDepartamento={departamentoMap[c.idDepartamento]}
                 nombreEmpleado={empleadoMap[c.idEmpleado]}
                 nombreCargo={cargoMap[c.idCargo]}
@@ -113,7 +112,7 @@ const ListadoContrataciones = () => {
                 fechaContratacion={c.fechaContratacion}
                 salario={c.salario}
                 estado={c.estado}
-                onDelete={() => handleDelete(c.id)}
+                onDelete={handleDelete}
               />
             ))
           ) : (

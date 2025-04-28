@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { deleteContratacion } from "@/service/ContratacioneService";
 
 export default function ContratacionCard({
-  id, // Ensure the ID is passed correctly
+  id,
   nombreDepartamento,
   nombreEmpleado,
   nombreCargo,
@@ -28,7 +28,7 @@ export default function ContratacionCard({
         const success = await deleteContratacion(id);
         if (success) {
           alert("Contratación eliminada exitosamente.");
-          onDelete(id); // <--- Aquí debes PASAR el ID
+          onDelete(id);
         }
       } catch (error) {
         console.error("Error al eliminar contratación:", error);
@@ -36,7 +36,6 @@ export default function ContratacionCard({
       }
     }
   };
-  
 
   return (
     <div className="card">
@@ -54,3 +53,4 @@ export default function ContratacionCard({
     </div>
   );
 }
+

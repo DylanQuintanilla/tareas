@@ -20,6 +20,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContratacionRequest {
+    @NotNull(message = "El ID del contrato es requerido")
+    private Long idContratacion;
+
     @NotNull(message = "El ID del departamento es requerido")
     private Long idDepartamento;
 

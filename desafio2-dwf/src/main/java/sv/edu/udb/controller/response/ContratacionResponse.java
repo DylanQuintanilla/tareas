@@ -13,6 +13,7 @@ import lombok.experimental.FieldNameConstants;
 @Builder(toBuilder = true)
 @FieldNameConstants
 public class ContratacionResponse {
+    private Long idContratacion;
     private LocalDate fechaContratacion;
     private BigDecimal salario;
     private Boolean estado;
@@ -22,4 +23,18 @@ public class ContratacionResponse {
     private Long idDepartamento;
     private Long idCargo;
     private Long idTipoContratacion;
+
+    @Override
+    public String toString() {
+        return "ContratacionResponse{" +
+                "idContratacion=" + idContratacion +
+                "fechaContratacion=" + fechaContratacion +
+                ", salario=" + salario +
+                ", estado=" + estado +
+                ", idEmpleado=" + idEmpleado +
+                ", idDepartamento=" + idDepartamento +
+                ", idCargo=" + idCargo +
+                ", idTipoContratacion=" + idTipoContratacion +
+                '}';
+    }
 }

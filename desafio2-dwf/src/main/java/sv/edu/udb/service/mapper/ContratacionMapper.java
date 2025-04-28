@@ -23,8 +23,8 @@ import java.util.List;
 public abstract class ContratacionMapper {
 
     @Autowired protected DepartamentoRepository departamentoRepository;
-    @Autowired protected EmpleadoRepository    empleadoRepository;
-    @Autowired protected CargoRepository       cargoRepository;
+    @Autowired protected EmpleadoRepository empleadoRepository;
+    @Autowired protected CargoRepository cargoRepository;
     @Autowired protected TipoContratacionRepository tipoContratacionRepository;
 
     @Mapping(target = "id", ignore = true)
@@ -38,9 +38,10 @@ public abstract class ContratacionMapper {
             expression = "java(referenceTipoContratacion(request.getIdTipoContratacion()))")
     public abstract Contratacion toEntity(ContratacionRequest request);
 
+    @Mapping(target = "idContratacion", source = "id") // Map the ID field to idContratacion
     @Mapping(target = "idDepartamento", source = "departamento.id")
-    @Mapping(target = "idEmpleado",    source = "empleado.id")
-    @Mapping(target = "idCargo",       source = "cargo.id")
+    @Mapping(target = "idEmpleado", source = "empleado.id")
+    @Mapping(target = "idCargo", source = "cargo.id")
     @Mapping(target = "idTipoContratacion", source = "tipoContratacion.id")
     public abstract ContratacionResponse toResponse(Contratacion contratacion);
 
