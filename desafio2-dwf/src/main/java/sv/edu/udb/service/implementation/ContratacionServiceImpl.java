@@ -11,6 +11,7 @@ import sv.edu.udb.exception.ResourceNotFoundException;
 import sv.edu.udb.repository.ContratacionRepository;
 import sv.edu.udb.service.ContratacionService;
 import sv.edu.udb.service.mapper.ContratacionMapper;
+import sv.edu.udb.service.mapper.ContratacionMapperHelper;
 
 import java.util.List;
 
@@ -19,12 +20,15 @@ public class ContratacionServiceImpl implements ContratacionService {
 
     private final ContratacionRepository contratacionRepository;
     private final ContratacionMapper contratacionMapper;
+    private final ContratacionMapperHelper contratacionMapperHelper;
 
     @Autowired
     public ContratacionServiceImpl(ContratacionRepository contratacionRepository,
-                                   ContratacionMapper contratacionMapper) {
+                                   ContratacionMapper contratacionMapper,
+                                   ContratacionMapperHelper contratacionMapperHelper) {
         this.contratacionRepository = contratacionRepository;
         this.contratacionMapper = contratacionMapper;
+        this.contratacionMapperHelper = contratacionMapperHelper;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class ContratacionServiceImpl implements ContratacionService {
     @Override
     @Transactional
     public ContratacionResponse save(ContratacionRequest request) {
-        Contratacion contratacion = contratacionMapper.toEntity(request);
+        Contratacion contratacion = contratacionMapperHelper.toEntity(request);
         contratacion = contratacionRepository.save(contratacion);
         return contratacionMapper.toResponse(contratacion);
     }
@@ -56,7 +60,7 @@ public class ContratacionServiceImpl implements ContratacionService {
         Contratacion contratacion = contratacionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Contratación no encontrada con ID: " + id));
 
-        contratacionMapper.updateEntityFromRequest(request, contratacion);
+        contratacionMapperHelper.updateEntityFromRequest(request, contratacion);
         contratacion = contratacionRepository.save(contratacion);
 
         return contratacionMapper.toResponse(contratacion);
