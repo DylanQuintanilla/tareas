@@ -7,17 +7,18 @@ export default function EmpleadoCard({ empleado, onDelete }) {
   const router = useRouter();
 
   const handleDelete = async () => {
-    if (!empleado.id) {
+    const empleadoId = empleado.id || empleado.idEmpleado;
+    if (!empleadoId) {
       console.error("El ID del empleado es undefined o no válido:", empleado);
       return;
     }
 
     if (confirm("¿Estás seguro de eliminar este empleado?")) {
       try {
-        const success = await deleteEmpleado(empleado.id);
+        const success = await deleteEmpleado(empleadoId);
         if (success) {
           alert("Empleado eliminado exitosamente.");
-          onDelete(empleado.id); // Notify parent to update the list
+          onDelete(empleadoId); // Notify parent to update the list
         }
       } catch (error) {
         console.error("Error al eliminar empleado:", error);
@@ -35,9 +36,11 @@ export default function EmpleadoCard({ empleado, onDelete }) {
       <p>Correo: {empleado.correoInstitucional}</p>
       <p>Fecha Nacimiento: {empleado.fechaNacimiento}</p>
       <div className="button-group">
-        <button onClick={() => router.push(`/dashboard/ver-empleado/${empleado.id}`)}>Ver</button>
-        <button onClick={() => router.push(`/dashboard/editar-empleado/${empleado.id}`)}>Editar</button>
-        <button onClick={handleDelete}>Eliminar</button>
+        <button onClick={() => router.push(`/dashboard/ver-empleado/${empleado.id || empleado.idEmpleado}`)}>Ver</button>
+        <button onClick={() => router.push(`/dashboard/editar-empleado/${empleado.id || empleado.idEmpleado}`)}>Editar</button>
+        <button onClick={handleDelete}>
+          Eliminar
+        </button>
       </div>
     </div>
   );

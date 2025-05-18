@@ -58,7 +58,8 @@ const EditarEmpleado = () => {
   const handleSave = async (updatedEmpleado) => {
     try {
       setIsLoading(true);
-      const data = await updateEmpleado(id, updatedEmpleado);
+      const empleadoId = updatedEmpleado.id || updatedEmpleado.idEmpleado;
+      const data = await updateEmpleado(empleadoId, updatedEmpleado);
       alert("Empleado actualizado exitosamente.");
       router.push(`/dashboard/ver-empleado/${data.id}`);
     } catch (err) {

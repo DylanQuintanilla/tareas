@@ -58,13 +58,27 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
     if (!validarCampos()) return;
     setIsLoading(true);
     try {
-      if (empleado.id) {
-        await updateEmpleado(empleado.id, empleado);
+      let empleadoId = empleado.id ?? empleado.idEmpleado;
+      if (modo === "editar") {
+        if (!empleadoId) {
+          setError("No se encontró el ID del empleado para actualizar.");
+          setIsLoading(false);
+          return;
+        }
+        const data = await updateEmpleado(empleadoId, { ...empleado, id: empleadoId });
+        // Solo intenta acceder a data.id si data existe y tiene id
+        if (data && data.id) {
+          if (onSave) onSave();
+          router.push("/dashboard/ver-empleado/" + data.id);
+        } else {
+          if (onSave) onSave();
+          router.push("/dashboard/listado-empleados");
+        }
       } else {
         await createEmpleado(empleado);
+        if (onSave) onSave();
+        router.push("/dashboard/listado-empleados");
       }
-      onSave();
-      router.push("/dashboard/listado-empleados");
     } catch (err) {
       setError(err.message || "Error al guardar los datos del empleado.");
     } finally {

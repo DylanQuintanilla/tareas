@@ -29,7 +29,11 @@ const ListadoEmpleados = () => {
   }, []);
 
   const handleDelete = (id) => {
-    setEmpleados((prevEmpleados) => prevEmpleados.filter((empleado) => empleado.id !== id));
+    setEmpleados((prevEmpleados) =>
+      prevEmpleados.filter(
+        (empleado) => (empleado.id || empleado.idEmpleado) !== id
+      )
+    );
   };
 
   if (isLoading) {
@@ -65,8 +69,11 @@ const ListadoEmpleados = () => {
           {empleados.length > 0 ? (
             empleados.map((empleado) => (
               <EmpleadoCard
-                key={empleado.idEmpleado || empleado.id} // Usa un identificador único y consistente
-                empleado={empleado}
+                key={empleado.idEmpleado || empleado.id}
+                empleado={{
+                  ...empleado,
+                  id: empleado.id || empleado.idEmpleado // asegura que siempre haya un id
+                }}
                 onDelete={handleDelete}
               />
             ))
