@@ -65,7 +65,7 @@ const ListadoEmpleados = () => {
           {empleados.length > 0 ? (
             empleados.map((empleado) => (
               <EmpleadoCard
-                key={empleado.id}
+                key={empleado.idEmpleado || empleado.id} // Usa un identificador único y consistente
                 empleado={empleado}
                 onDelete={handleDelete}
               />
