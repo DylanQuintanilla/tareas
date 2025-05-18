@@ -3,12 +3,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createEmpleado, updateEmpleado } from "@/service/EmpleadoService";
 
-const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
+const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Initialize the form state with the provided employee data or default values
+  // Inicializa el formulario con los datos del empleadoInicial si existen
   const [empleado, setEmpleado] = useState({
     nombrePersona: "",
     usuario: "",
@@ -16,11 +16,17 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
     numeroTelefono: "",
     correoInstitucional: "",
     fechaNacimiento: "",
+    id: undefined,
   });
 
   useEffect(() => {
-    if (empleadoInicial) {
-      setEmpleado(empleadoInicial);
+    // Solo actualiza si los datos realmente cambiaron
+    if (empleadoInicial && Object.keys(empleadoInicial).length > 0) {
+      setEmpleado((prev) => ({
+        ...prev,
+        ...empleadoInicial,
+        id: empleadoInicial.id || empleadoInicial.idEmpleado || prev.id,
+      }));
     }
   }, [empleadoInicial]);
 
@@ -32,19 +38,31 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
     }));
   };
 
+  const validarCampos = () => {
+    const duiRegex = /^\d{8}-\d{1}$/;
+    const telRegex = /^\+[1-9]\d{1,14}$/;
+    if (!duiRegex.test(empleado.numeroDUI)) {
+      setError("Formato de DUI inválido. Ejemplo: 06371984-6");
+      return false;
+    }
+    if (!telRegex.test(empleado.numeroTelefono)) {
+      setError("Formato de teléfono inválido. Ejemplo: +50375480324");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!validarCampos()) return;
     setIsLoading(true);
     try {
       if (empleado.id) {
-        // Update existing employee
         await updateEmpleado(empleado.id, empleado);
       } else {
-        // Create new employee
         await createEmpleado(empleado);
       }
-      // Redirect to the employee list after successful creation or update
       onSave();
       router.push("/dashboard/listado-empleados");
     } catch (err) {
@@ -66,7 +84,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
               id="nombrePersona"
               name="nombrePersona"
               placeholder="Nombre Persona"
-              value={empleado.nombrePersona}
+              value={empleado.nombrePersona ?? ""}
               onChange={handleChange}
               required
             />
@@ -78,7 +96,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
               id="usuario"
               name="usuario"
               placeholder="Usuario"
-              value={empleado.usuario}
+              value={empleado.usuario ?? ""}
               onChange={handleChange}
               required
             />
@@ -92,7 +110,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
               id="numeroDUI"
               name="numeroDUI"
               placeholder="Número DUI"
-              value={empleado.numeroDUI}
+              value={empleado.numeroDUI ?? ""}
               onChange={handleChange}
             />
           </div>
@@ -103,7 +121,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
               id="numeroTelefono"
               name="numeroTelefono"
               placeholder="Número Teléfono"
-              value={empleado.numeroTelefono}
+              value={empleado.numeroTelefono ?? ""}
               onChange={handleChange}
             />
           </div>
@@ -115,7 +133,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
             id="correoInstitucional"
             name="correoInstitucional"
             placeholder="ejemplo@correo.com"
-            value={empleado.correoInstitucional}
+            value={empleado.correoInstitucional ?? ""}
             onChange={handleChange}
           />
         </div>
@@ -125,13 +143,13 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave }) => {
             type="date"
             id="fechaNacimiento"
             name="fechaNacimiento"
-            value={empleado.fechaNacimiento}
+            value={empleado.fechaNacimiento ?? ""}
             onChange={handleChange}
           />
         </div>
         <div className="button-group">
           <button type="submit" disabled={isLoading}>
-            {isLoading ? "Guardando..." : empleado.id ? "Actualizar" : "Crear"}
+            {isLoading ? "Guardando..." : modo === "editar" ? "Actualizar" : "Crear"}
           </button>
         </div>
       </form>

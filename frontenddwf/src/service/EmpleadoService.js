@@ -23,9 +23,9 @@ export const obtenerEmpleados = async () => {
 
 
 // Obtener un empleado por ID (nueva función).
-export const getEmpleado = async (id) => {
+export const getEmpleadoById = async (id) => {
   try {
-    if (!id) {
+    if (!id || id === "undefined") {
       throw new Error("El ID del empleado no fue proporcionado.");
     }
     console.log(`Fetching empleado con ID: ${id}`);
@@ -35,12 +35,24 @@ export const getEmpleado = async (id) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Error en la respuesta:", errorData.message);
-      throw new Error(errorData.message || `Error al obtener empleado: ${response.status}`);
+      // Intenta extraer mensaje de error solo si hay contenido
+      let errorMsg = `Error al obtener empleado: ${response.status}`;
+      try {
+        const errorData = await response.clone().json();
+        errorMsg = errorData.message || errorMsg;
+      } catch (e) {
+        // No hay JSON en la respuesta
+      }
+      console.error("Error en la respuesta:", errorMsg);
+      throw new Error(errorMsg);
     }
 
-    const data = await response.json();
+    // Si la respuesta está vacía, retorna null
+    const text = await response.text();
+    if (!text) {
+      return null;
+    }
+    const data = JSON.parse(text);
     console.log("Empleado obtenido exitosamente:", data);
     return data;
   } catch (error) {
@@ -50,7 +62,7 @@ export const getEmpleado = async (id) => {
 };
 
 // Alias para getEmpleado (nueva función).
-export const obtenerEmpleado = getEmpleado;
+export const obtenerEmpleado = getEmpleadoById;
 
 // Export getEmpleados for consistency
 export const getEmpleados = obtenerEmpleados;
@@ -59,31 +71,49 @@ export const getEmpleados = obtenerEmpleados;
 // Crear un nuevo empleado.
 export const createEmpleado = async (empleado) => {
   try {
-    console.log("Enviando datos del empleado:", empleado); // Debugging: Log the request body
+    console.log("Enviando datos del empleado:", empleado);
+    // No incluyas el campo id en el body
+    const {
+      nombrePersona,
+      usuario,
+      numeroDUI,
+      numeroTelefono,
+      correoInstitucional,
+      fechaNacimiento,
+    } = empleado;
+
     const response = await fetch(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        nombrePersona: empleado.nombrePersona,
-        usuario: empleado.usuario,
-        numeroDUI: empleado.numeroDUI,
-        numeroTelefono: empleado.numeroTelefono,
-        correoInstitucional: empleado.correoInstitucional,
-        fechaNacimiento: empleado.fechaNacimiento,
+        nombrePersona,
+        usuario,
+        numeroDUI,
+        numeroTelefono,
+        correoInstitucional,
+        fechaNacimiento,
       }),
     });
 
-    const data = await response.json();
-    console.log("Empleado creado:", data);
-
-    if (!response.ok) {
-      console.error("Error en la respuesta:", data.errors || data.message); // Log validation errors
-      throw new Error(data.errors?.[0]?.defaultMessage || data.message || `Error al crear empleado: ${response.status}`);
+    // Maneja respuesta vacía o error
+    let data = null;
+    const text = await response.text();
+    if (text) {
+      data = JSON.parse(text);
     }
 
-    return data; // Assuming the API returns the created employee object
+    if (!response.ok) {
+      const errorMsg =
+        (data && (data.errors?.[0]?.defaultMessage || data.message)) ||
+        `Error al crear empleado: ${response.status}`;
+      console.error("Error en la respuesta:", errorMsg);
+      throw new Error(errorMsg);
+    }
+
+    console.log("Empleado creado:", data);
+    return data;
   } catch (error) {
     console.error("Error al crear empleado:", error.message);
     throw error;

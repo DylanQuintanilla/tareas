@@ -6,9 +6,9 @@ import { getEmpleadoById, updateEmpleado } from "@/service/EmpleadoService";
 
 const EditarEmpleado = () => {
   const params = useParams();
+  const id = params?.id;
   const router = useRouter();
-  
-  // Estado inicial vacío para el empleado
+
   const [empleado, setEmpleado] = useState({
     nombrePersona: "",
     usuario: "",
@@ -20,38 +20,46 @@ const EditarEmpleado = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Cargar los datos del empleado si existe params.id
   useEffect(() => {
-    if (params.id) {
-      const fetchEmpleado = async () => {
-        try {
-          setIsLoading(true);
-          const data = await getEmpleadoById(params.id);
-          if (data) {
-            setEmpleado(data);
-          } else {
-            setError("Empleado no encontrado.");
-          }
-        } catch (err) {
-          setError(err.message);
-        } finally {
-          setIsLoading(false);
+    const fetchEmpleado = async () => {
+      if (!id || id === "undefined" || id === "") {
+        setError("ID de empleado no proporcionado.");
+        return;
+      }
+      try {
+        setIsLoading(true);
+        const data = await getEmpleadoById(id);
+        if (data) {
+          setEmpleado({
+            ...data,
+            id: data.id || data.idEmpleado, // <-- mapea idEmpleado a id para el formulario
+          });
+          setError("");
+        } else {
+          setEmpleado({
+            nombrePersona: "",
+            usuario: "",
+            numeroDUI: "",
+            numeroTelefono: "",
+            correoInstitucional: "",
+            fechaNacimiento: "",
+          });
+          setError("");
         }
-      };
-      fetchEmpleado();
-    } else {
-      setError("ID del empleado no proporcionado.");
-      console.error("ID del empleado no proporcionado.");
-    }
-  }, [params.id]);
+      } catch (err) {
+        setError(err.message || "Error al obtener el empleado.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchEmpleado();
+  }, [id]);
 
-  // Función para guardar los cambios, similar a la de Jugador
   const handleSave = async (updatedEmpleado) => {
     try {
       setIsLoading(true);
-      const data = await updateEmpleado(params.id, updatedEmpleado);
+      const data = await updateEmpleado(id, updatedEmpleado);
       alert("Empleado actualizado exitosamente.");
-      // Asegúrate de que data.id contenga el ID correcto
       router.push(`/dashboard/ver-empleado/${data.id}`);
     } catch (err) {
       console.error("Error al actualizar empleado:", err.message);
@@ -69,7 +77,8 @@ const EditarEmpleado = () => {
     );
   }
 
-  if (error) {
+  // Solo muestra error si es realmente un error de backend
+  if (error && error !== "ID de empleado no proporcionado.") {
     return (
       <div className="container">
         <h2>Error: {error}</h2>
@@ -79,8 +88,8 @@ const EditarEmpleado = () => {
 
   return (
     <div className="container my-5">
-      <h2>{params.id ? "Editar Empleado" : "Crear Empleado"}</h2>
-      <EmpleadoFormulario empleadoInicial={empleado} onSave={handleSave} />
+      <h2>Actualizar Empleado</h2>
+      <EmpleadoFormulario empleadoInicial={empleado} onSave={handleSave} modo="editar" />
     </div>
   );
 };
