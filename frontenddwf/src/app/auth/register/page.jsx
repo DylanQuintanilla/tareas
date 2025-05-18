@@ -4,6 +4,7 @@ import RegisterFormulario from "@/components/RegisterFormulario";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/AuthContext";
+import "@/styles/auth-form.css";
 
 const Register = () => {
   const router = useRouter();
@@ -16,8 +17,8 @@ const Register = () => {
   }, [user, router]);
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f4f6fb" }}>
+      <div className="auth-form-container">
         <RegisterFormulario onSuccess={() => router.push("/auth/login")} />
         <p>
           ¿Ya tienes una cuenta?{" "}

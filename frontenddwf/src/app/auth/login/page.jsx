@@ -4,20 +4,21 @@ import LoginFormulario from "@/components/LoginFormulario";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/AuthContext";
+import "@/styles/auth-form.css";
 
 const Login = () => {
   const router = useRouter();
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      router.replace("/dashboard");
-    }
-  }, [user, router]);
+  // Redirige si ya está logueado
+  if (user) {
+    router.replace("/dashboard");
+    return null;
+  }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f4f6fb" }}>
+      <div className="auth-form-container">
         <LoginFormulario onSuccess={() => router.push("/dashboard")} />
         <p>
           ¿No tienes una cuenta?{" "}

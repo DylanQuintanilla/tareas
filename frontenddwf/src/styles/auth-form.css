@@ -1,0 +1,118 @@
+:root {
+--primary-gradient-start: #7c6cf7;
+--primary-gradient-end: #5a4be7;
+--background-light: #f9fafb;
+--background: #ffffff;
+--text-dark: #2d2d2d;
+--text-muted: #444444;
+--error-color: #e74c3c;
+--error-bg: #fbeaea;
+--success-color: #27ae60;
+--success-bg: #eafaf1;
+}
+
+.auth-form-container {
+background: var(--background);
+border-radius: 1rem;
+box-shadow: 0 8px 24px rgba(44, 62, 80, 0.12);
+padding: 2.5rem 2rem;
+max-width: 400px;
+width: 100%;
+margin: 2rem auto;
+display: grid;
+grid-template-rows: auto 1fr auto;
+row-gap: 1.5rem;
+}
+
+.auth-form-container h2 {
+margin: 0;
+text-align: center;
+color: var(--text-dark);
+font-size: 1.75rem;
+font-weight: 700;
+letter-spacing: 0.5px;
+}
+
+.auth-form-container form {
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 1.25rem;
+}
+
+.auth-form-container label {
+display: block;
+font-size: 0.9rem;
+font-weight: 500;
+color: var(--text-muted);
+margin-bottom: 0.25rem;
+}
+
+.auth-form-container input {
+width: 100%;
+padding: 0.75rem 1rem;
+border: 1px solid #d1d5db;
+border-radius: 0.5rem;
+font-size: 1rem;
+background: var(--background-light);
+transition: border-color 0.2s ease;
+}
+
+.auth-form-container input:focus {
+outline: none;
+border-color: var(--primary-gradient-start);
+background: var(--background);
+}
+
+.auth-form-container button[type="submit"] {
+background: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
+color: var(--background);
+border: none;
+border-radius: 0.75rem;
+padding: 0.875rem 0;
+font-size: 1.05rem;
+font-weight: 600;
+cursor: pointer;
+transition: background 0.3s ease;
+}
+
+.auth-form-container button[type="submit"]:hover {
+background: linear-gradient(90deg, var(--primary-gradient-end), var(--primary-gradient-start));
+}
+
+.auth-form-container .error,
+.auth-form-container .success {
+padding: 0.5rem 1rem;
+border-radius: 0.5rem;
+font-size: 0.95rem;
+text-align: center;
+}
+
+.auth-form-container .error {
+color: var(--error-color);
+background: var(--error-bg);
+}
+
+.auth-form-container .success {
+color: var(--success-color);
+background: var(--success-bg);
+}
+
+.auth-form-container p {
+margin: 0;
+text-align: center;
+font-size: 0.95rem;
+}
+
+.auth-form-container a {
+color: var(--primary-gradient-start);
+text-decoration: none;
+font-weight: 500;
+transition: color 0.2s ease;
+}
+
+.auth-form-container a:hover {
+color: var(--primary-gradient-end);
+text-decoration: underline;
+}
+

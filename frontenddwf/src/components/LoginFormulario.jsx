@@ -21,7 +21,7 @@ const LoginFormulario = ({ onSuccess }) => {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Iniciar Sesión</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="error">{error}</p>}
       <div>
         <label>Usuario</label>
         <input
@@ -41,7 +41,6 @@ const LoginFormulario = ({ onSuccess }) => {
         />
       </div>
       <button type="submit">Ingresar</button>
-      {/* No es necesario cambiar nada aquí si solo usas el formulario, pero si tienes enlaces internos, usa minúsculas. */}
     </form>
   );
 };

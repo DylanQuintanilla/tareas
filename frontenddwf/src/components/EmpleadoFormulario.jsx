@@ -8,7 +8,6 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Inicializa el formulario con los datos del empleadoInicial si existen
   const [empleado, setEmpleado] = useState({
     nombrePersona: "",
     usuario: "",
@@ -20,7 +19,6 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
   });
 
   useEffect(() => {
-    // Solo actualiza si los datos realmente cambiaron
     if (empleadoInicial && Object.keys(empleadoInicial).length > 0) {
       setEmpleado((prev) => ({
         ...prev,
@@ -30,23 +28,53 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
     }
   }, [empleadoInicial]);
 
+  // Formatear DUI automáticamente: 12345678-9
+  const formatearDUI = (valor) => {
+    const soloNumeros = valor.replace(/\D/g, "").slice(0, 9); // máx 9 dígitos
+    if (soloNumeros.length > 8) {
+      return soloNumeros.slice(0, 8) + "-" + soloNumeros.slice(8);
+    }
+    return soloNumeros;
+  };
+
+  // Formatear Teléfono automáticamente: 1234-5678
+  const formatearTelefono = (valor) => {
+    const soloNumeros = valor.replace(/\D/g, "").slice(0, 8); // máx 8 dígitos
+    if (soloNumeros.length > 4) {
+      return soloNumeros.slice(0, 4) + "-" + soloNumeros.slice(4);
+    }
+    return soloNumeros;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    let nuevoValor = value;
+
+    if (name === "numeroDUI") {
+      nuevoValor = formatearDUI(value);
+    }
+
+    if (name === "numeroTelefono") {
+      nuevoValor = formatearTelefono(value);
+    }
+
     setEmpleado((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: nuevoValor,
     }));
   };
 
   const validarCampos = () => {
     const duiRegex = /^\d{8}-\d{1}$/;
-    const telRegex = /^\+[1-9]\d{1,14}$/;
+    const telRegex = /^\d{4}-\d{4}$/;
+
     if (!duiRegex.test(empleado.numeroDUI)) {
       setError("Formato de DUI inválido. Ejemplo: 06371984-6");
       return false;
     }
     if (!telRegex.test(empleado.numeroTelefono)) {
-      setError("Formato de teléfono inválido. Ejemplo: +50375480324");
+      setError("Formato de teléfono inválido. Ejemplo: 7548-0324");
       return false;
     }
     return true;
@@ -57,6 +85,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
     setError("");
     if (!validarCampos()) return;
     setIsLoading(true);
+
     try {
       let empleadoId = empleado.id ?? empleado.idEmpleado;
       if (modo === "editar") {
@@ -66,7 +95,6 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
           return;
         }
         const data = await updateEmpleado(empleadoId, { ...empleado, id: empleadoId });
-        // Solo intenta acceder a data.id si data existe y tiene id
         if (data && data.id) {
           if (onSave) onSave();
           router.push("/dashboard/ver-empleado/" + data.id);
@@ -116,6 +144,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
             />
           </div>
         </div>
+
         <div className="form-row">
           <div className="form-group">
             <label htmlFor="numeroDUI">Número DUI</label>
@@ -123,23 +152,29 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
               type="text"
               id="numeroDUI"
               name="numeroDUI"
-              placeholder="Número DUI"
+              placeholder="Ej: 06371984-6"
+              maxLength={10}
               value={empleado.numeroDUI ?? ""}
               onChange={handleChange}
+              required
             />
           </div>
+
           <div className="form-group">
             <label htmlFor="numeroTelefono">Número Teléfono</label>
             <input
               type="text"
               id="numeroTelefono"
               name="numeroTelefono"
-              placeholder="Número Teléfono"
+              placeholder="Ej: 7548-0324"
+              maxLength={9}
               value={empleado.numeroTelefono ?? ""}
               onChange={handleChange}
+              required
             />
           </div>
         </div>
+
         <div className="form-group">
           <label htmlFor="correoInstitucional">Correo Institucional</label>
           <input
@@ -151,6 +186,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
             onChange={handleChange}
           />
         </div>
+
         <div className="form-group">
           <label htmlFor="fechaNacimiento">Fecha Nacimiento</label>
           <input
@@ -161,6 +197,7 @@ const EmpleadoFormulario = ({ empleadoInicial = null, onSave, modo = "crear" }) 
             onChange={handleChange}
           />
         </div>
+
         <div className="button-group">
           <button type="submit" disabled={isLoading}>
             {isLoading ? "Guardando..." : modo === "editar" ? "Actualizar" : "Crear"}
