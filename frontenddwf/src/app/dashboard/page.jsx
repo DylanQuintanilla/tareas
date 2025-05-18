@@ -18,23 +18,32 @@ const Dashboard = () => {
             <Link href="/dashboard/listado-contrataciones">Listado de Contrataciones</Link>
           </li>
           <li>
+            <Link href="/dashboard/listado-cargos">Listado de Cargos</Link>
+          </li>
+          <li>
+            <Link href="/dashboard/listado-departamentos">Listado de Departamentos</Link>
+          </li>
+          <li>
+            <Link href="/dashboard/listado-tipos-contratacion">Listado de Tipos de Contratación</Link>
+          </li>
+          <li>
             <Link href="/dashboard/crear-empleado">Crear Empleado</Link>
           </li>
           <li>
             <Link href="/dashboard/crear-contratacion">Crear Contratación</Link>
           </li>
           <li>
-            <Link href="/dashboard/listado-cargos">Cargos</Link>
+            <Link href="/dashboard/crear-cargo">Crear Cargo</Link>
           </li>
           <li>
-            <Link href="/dashboard/listado-departamentos">Departamentos</Link>
+            <Link href="/dashboard/crear-departamento">Crear Departamento</Link>
           </li>
           <li>
-            <Link href="/dashboard/listado-tipos-contratacion">Tipos de Contratación</Link>
+            <Link href="/dashboard/crear-tipo-contratacion">Crear Tipo de Contratación</Link>
           </li>
-          <li>
+          {/* <li>
             <Link href="/dashboard/estadisticas">Estadísticas</Link>
-          </li>
+          </li> */}
         </ul>
       </main>
       <Footer />

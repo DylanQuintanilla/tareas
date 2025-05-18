@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,6 +8,7 @@ import { getDepartamentos } from "@/service/DepartamentoService";
 import { getEmpleados } from "@/service/EmpleadoService";
 import { getCargos } from "@/service/CargosServices";
 import { getTiposContratacion } from "@/service/TipoContratacion";
+import { useRouter } from "next/navigation";
 
 const ListadoContrataciones = () => {
   const [contrataciones, setContrataciones] = useState([]);
@@ -18,6 +18,7 @@ const ListadoContrataciones = () => {
   const [tiposContratacion, setTiposContratacion] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -113,7 +114,23 @@ const ListadoContrataciones = () => {
                 salario={c.salario}
                 estado={c.estado}
                 onDelete={handleDelete}
-              />
+              >
+                {/* Botón Editar agregado aquí */}
+                <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "10px" }}>
+                  <button
+                    style={{ background: "#7c6cf7", color: "#fff", border: "none", borderRadius: "20px", padding: "8px 20px", cursor: "pointer" }}
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/editar-contratacion/${c.idContratacion}`
+                      )
+                    }
+                  >
+                    Editar
+                  </button>
+                  {/* Si quieres el botón Eliminar aquí también, descomenta la siguiente línea: */}
+                  {/* <button onClick={() => handleDelete(c.idContratacion)}>Eliminar</button> */}
+                </div>
+              </ContratacionCard>
             ))
           ) : (
             <p>No hay contrataciones registradas.</p>

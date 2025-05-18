@@ -58,10 +58,11 @@ const EditarEmpleado = () => {
   const handleSave = async (updatedEmpleado) => {
     try {
       setIsLoading(true);
-      const empleadoId = updatedEmpleado.id || updatedEmpleado.idEmpleado;
+      const empleadoId = updatedEmpleado.id ?? updatedEmpleado.idEmpleado;
       const data = await updateEmpleado(empleadoId, updatedEmpleado);
       alert("Empleado actualizado exitosamente.");
-      router.push(`/dashboard/ver-empleado/${data.id}`);
+      // Usa el id correcto para redirigir
+      router.push(`/dashboard/ver-empleado/${data.id ?? data.idEmpleado}`);
     } catch (err) {
       console.error("Error al actualizar empleado:", err.message);
       setError(err.message);

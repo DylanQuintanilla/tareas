@@ -3,20 +3,44 @@ import { obtenerCargos } from '../service/CargosServices';
 import { obtenerTiposContratacion } from '../service/TipoContratacion';
 import { obtenerDepartamentos } from '../service/DepartamentoService';
 import { obtenerEmpleados } from '../service/EmpleadoService';
+import { createContratacion, updateContratacion } from '../service/ContratacioneService';
 
-const FormularioContratacion = () => {
-  const [idCargo, setIdCargo] = useState(null);
-  const [idTipoContratacion, setIdTipoContratacion] = useState(null);
-  const [idDepartamento, setIdDepartamento] = useState(1);
-  const [idEmpleado, setIdEmpleado] = useState(1);
+const ContratacionFormulario = ({
+  contratacionInicial = null,
+  onSave,
+  modo = "crear",
+  isLoading: isLoadingProp = false,
+}) => {
+  const [idCargo, setIdCargo] = useState("");
+  const [idTipoContratacion, setIdTipoContratacion] = useState("");
+  const [idDepartamento, setIdDepartamento] = useState("");
+  const [idEmpleado, setIdEmpleado] = useState("");
   const [salario, setSalario] = useState('');
-  const [fechaContratacion, setFechaContratacion] = useState('2025-04-21');
+  const [fechaContratacion, setFechaContratacion] = useState('');
   const [estado, setEstado] = useState(true);
 
   const [cargos, setCargos] = useState([]);
   const [tiposContratacion, setTiposContratacion] = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
   const [empleados, setEmpleados] = useState([]);
+  const [isLoading, setIsLoading] = useState(isLoadingProp);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (contratacionInicial) {
+      setIdCargo(contratacionInicial.idCargo ?? "");
+      setIdTipoContratacion(contratacionInicial.idTipoContratacion ?? "");
+      setIdDepartamento(contratacionInicial.idDepartamento ?? "");
+      setIdEmpleado(contratacionInicial.idEmpleado ?? "");
+      setSalario(contratacionInicial.salario ?? "");
+      setFechaContratacion(contratacionInicial.fechaContratacion ?? "");
+      setEstado(
+        typeof contratacionInicial.estado === "boolean"
+          ? contratacionInicial.estado
+          : contratacionInicial.estado === "true"
+      );
+    }
+  }, [contratacionInicial]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,7 +55,7 @@ const FormularioContratacion = () => {
         setDepartamentos(departamentosData);
         setEmpleados(empleadosData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        setError('Error fetching data: ' + error.message);
       }
     };
 
@@ -40,6 +64,8 @@ const FormularioContratacion = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setIsLoading(true);
 
     const payload = {
       idDepartamento,
@@ -51,37 +77,30 @@ const FormularioContratacion = () => {
       salario,
     };
 
-    console.log('Payload a enviar:', payload);
-
     try {
-      const response = await fetch('http://localhost:8080/contrataciones', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error al guardar la contratación: ${response.status} ${response.statusText}`);
+      // Diferencia entre crear y editar
+      if (modo === "editar" && contratacionInicial && (contratacionInicial.id || contratacionInicial.idContratacion)) {
+        const idUpdate = contratacionInicial.id || contratacionInicial.idContratacion;
+        await updateContratacion(idUpdate, payload);
+      } else {
+        await createContratacion(payload);
       }
-
-      const data = await response.json();
-      console.log('Contratación guardada exitosamente:', data);
-      alert('Contratación guardada exitosamente.');
+      if (onSave) onSave();
     } catch (error) {
-      console.error('Error al guardar la contratación:', error.message);
-      alert('Error al guardar la contratación.');
+      setError(error.message || "Error al guardar la contratación.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <div>
         <label htmlFor="cargo">Cargo</label>
         <select
           id="cargo"
-          value={idCargo || ''}
+          value={idCargo}
           onChange={(e) => setIdCargo(e.target.value)}
         >
           <option value="">Seleccione un cargo</option>
@@ -97,7 +116,7 @@ const FormularioContratacion = () => {
         <label htmlFor="tipoContratacion">Tipo de Contratación</label>
         <select
           id="tipoContratacion"
-          value={idTipoContratacion || ''}
+          value={idTipoContratacion}
           onChange={(e) => setIdTipoContratacion(e.target.value)}
         >
           <option value="">Seleccione un tipo de contratación</option>
@@ -113,7 +132,7 @@ const FormularioContratacion = () => {
         <label htmlFor="departamento">Departamento</label>
         <select
           id="departamento"
-          value={idDepartamento || ''}
+          value={idDepartamento}
           onChange={(e) => setIdDepartamento(e.target.value)}
         >
           <option value="">Seleccione un departamento</option>
@@ -129,7 +148,7 @@ const FormularioContratacion = () => {
         <label htmlFor="empleado">Empleado</label>
         <select
           id="empleado"
-          value={idEmpleado || ''}
+          value={idEmpleado}
           onChange={(e) => setIdEmpleado(e.target.value)}
         >
           <option value="">Seleccione un empleado</option>
@@ -165,16 +184,18 @@ const FormularioContratacion = () => {
         <label htmlFor="estado">Estado</label>
         <select
           id="estado"
-          value={estado}
+          value={estado ? "true" : "false"}
           onChange={(e) => setEstado(e.target.value === 'true')}
         >
           <option value="true">Activo</option>
           <option value="false">Inactivo</option>
         </select>
       </div>
-      <button type="submit">Enviar</button>
+      <button type="submit" disabled={isLoading}>
+        {isLoading ? "Guardando..." : modo === "editar" ? "Actualizar" : "Crear"}
+      </button>
     </form>
   );
 };
 
-export default FormularioContratacion;
+export default ContratacionFormulario;
