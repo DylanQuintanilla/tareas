@@ -6,6 +6,7 @@ import EmpleadoCard from "@/components/EmpleadoCard";
 import { getEmpleados } from "@/service/EmpleadoService";
 import { useAuth } from "@/app/Context/AuthContext";
 import { jwtDecode } from "jwt-decode";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 const ListadoEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -76,12 +77,11 @@ const ListadoEmpleados = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-
+      <ConfirmDialog />
       <main className="container my-5">
         <h2 className="text-2xl font-bold text-indigo-700 mb-6">
           Listado de Empleados
         </h2>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {empleados.length > 0 ? (
             empleados.map((empleado) => (
@@ -90,6 +90,7 @@ const ListadoEmpleados = () => {
                 empleado={empleado}
                 onDelete={handleDelete}
                 canDelete={isAdmin}
+                showConfirmDialog={confirmDialog}
               />
             ))
           ) : (
@@ -97,7 +98,6 @@ const ListadoEmpleados = () => {
           )}
         </div>
       </main>
-
       <Footer />
     </div>
   );

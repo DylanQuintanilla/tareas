@@ -7,6 +7,7 @@ import { getDepartamentos, deleteDepartamento } from "@/service/DepartamentoServ
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/AuthContext";
 import { jwtDecode } from "jwt-decode";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 const ListadoDepartamentos = () => {
   const [departamentos, setDepartamentos] = useState([]);
@@ -80,6 +81,7 @@ const ListadoDepartamentos = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
+      <ConfirmDialog />
       <main className="container my-5">
         <h2 className="text-2xl font-bold text-indigo-700 mb-6">
           Listado de Departamentos
@@ -92,6 +94,7 @@ const ListadoDepartamentos = () => {
                 departamento={dep}
                 onDelete={handleDelete}
                 canDelete={isAdmin}
+                showConfirmDialog={confirmDialog}
               />
             ))
           ) : (

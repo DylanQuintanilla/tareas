@@ -6,6 +6,7 @@ import TipoContratacionCard from "@/components/TipoContratacionCard";
 import { getTiposContratacion, deleteTipoContratacion } from "@/service/TipoContratacion";
 import { useAuth } from "@/app/Context/AuthContext";
 import { jwtDecode } from "jwt-decode";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 const ListadoTiposContratacion = () => {
   const [tipos, setTipos] = useState([]);
@@ -85,6 +86,7 @@ const ListadoTiposContratacion = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
+      <ConfirmDialog />
       <main className="container my-5">
         <h2 className="text-2xl font-bold text-indigo-700 mb-6">
           Listado de Tipos de Contratación
@@ -97,6 +99,7 @@ const ListadoTiposContratacion = () => {
                 tipo={tipo}
                 onDelete={handleDelete}
                 canDelete={isAdmin}
+                showConfirmDialog={confirmDialog}
               />
             ))
           ) : (

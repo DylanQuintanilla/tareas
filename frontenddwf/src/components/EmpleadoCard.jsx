@@ -3,37 +3,37 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { deleteEmpleado } from "@/service/EmpleadoService";
 import { Button } from "primereact/button";
-import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { motion } from "framer-motion";
 
-function EmpleadoCard({ empleado, onDelete, canDelete }) {
+function EmpleadoCard({ empleado, onDelete, canDelete, showConfirmDialog }) {
   const router = useRouter();
 
   const handleDelete = async () => {
     const empleadoId = empleado.id || empleado.idEmpleado;
     if (!empleadoId) {
-      console.error("El ID del empleado es undefined o no válido:", empleado);
+      alert("ID de empleado no válido.");
       return;
     }
-    confirmDialog({
-      message: "¿Estás seguro de eliminar este empleado?",
-      header: "Confirmación de Eliminación",
-      icon: "pi pi-exclamation-triangle",
-      acceptClassName: "p-button-danger",
-      acceptLabel: "Sí, eliminar",
-      rejectLabel: "No, cancelar",
-      accept: async () => {
-        try {
-          const success = await deleteEmpleado(empleadoId);
-          if (success) {
+    if (showConfirmDialog) {
+      showConfirmDialog({
+        message: "¿Estás seguro de eliminar este empleado?",
+        header: "Confirmación de Eliminación",
+        icon: "pi pi-exclamation-triangle",
+        acceptClassName: "p-button-danger",
+        acceptLabel: "Sí, eliminar",
+        rejectLabel: "No, cancelar",
+        accept: async () => {
+          try {
+            // Manejo robusto de error: si la respuesta no es JSON, muestra mensaje genérico
+            await deleteEmpleado(empleadoId);
             alert("Empleado eliminado exitosamente.");
             onDelete(empleadoId);
+          } catch (error) {
+            alert("Error al eliminar empleado.");
           }
-        } catch (error) {
-          alert("Error al eliminar empleado.");
-        }
-      },
-    });
+        },
+      });
+    }
   };
 
   return (
@@ -43,7 +43,6 @@ function EmpleadoCard({ empleado, onDelete, canDelete }) {
       transition={{ duration: 0.5 }}
       className="relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 group min-w-[320px] max-w-lg"
     >
-      <ConfirmDialog />
       <div className="p-6 md:p-8 flex flex-col gap-5">
         <h3 className="text-2xl md:text-3xl font-extrabold text-indigo-800 leading-tight">
           {empleado.nombrePersona}

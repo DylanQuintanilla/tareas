@@ -2,24 +2,11 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "primereact/button";
-import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { motion } from "framer-motion";
 
 export default function CargoCard({ cargo, onDelete, canDelete }) {
   const router = useRouter();
   const id = cargo.id || cargo.idCargo;
-
-  const handleDelete = () => {
-    confirmDialog({
-      message: "¿Estás seguro de eliminar este cargo?",
-      header: "Confirmación de Eliminación",
-      icon: "pi pi-exclamation-triangle",
-      acceptClassName: "p-button-danger",
-      acceptLabel: "Sí, eliminar",
-      rejectLabel: "No, cancelar",
-      accept: () => onDelete(id),
-    });
-  };
 
   return (
     <motion.div
@@ -28,10 +15,9 @@ export default function CargoCard({ cargo, onDelete, canDelete }) {
       transition={{ duration: 0.5 }}
       className="relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 group min-w-[320px] max-w-lg"
     >
-      <ConfirmDialog />
       <div className="p-6 md:p-8 flex flex-col gap-5">
         <h3 className="text-2xl md:text-3xl font-extrabold text-indigo-800 leading-tight">
-          {cargo.cargo || "Sin nombre"}
+          {cargo.cargo}
         </h3>
         <div className="grid grid-cols-1 gap-y-3 text-gray-700 text-base">
           <p className="flex items-center gap-2">
@@ -40,13 +26,16 @@ export default function CargoCard({ cargo, onDelete, canDelete }) {
           </p>
           <p className="flex items-center gap-2">
             <i className="pi pi-align-left text-indigo-500 text-lg"></i>
-            <span className="font-medium">Descripción:</span> {cargo.descripcionCargo || "—"}
+            <span className="font-medium">Descripción:</span>{" "}
+            {cargo.descripcionCargo}
           </p>
           <p className="flex items-center gap-2">
             <i className="pi pi-star text-indigo-500 text-lg"></i>
-            <span className="font-medium">Jefatura:</span> {cargo.jefatura ? "Sí" : "No"}
+            <span className="font-medium">Jefatura:</span>{" "}
+            {cargo.jefatura ? "Sí" : "No"}
           </p>
         </div>
+
         <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-100 mt-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Button
             label="Ver"
@@ -65,7 +54,7 @@ export default function CargoCard({ cargo, onDelete, canDelete }) {
               label="Eliminar"
               icon="pi pi-trash"
               className="p-button-sm p-button-outlined p-button-danger flex-grow"
-              onClick={handleDelete}
+              onClick={() => onDelete(id)}
             />
           )}
         </div>

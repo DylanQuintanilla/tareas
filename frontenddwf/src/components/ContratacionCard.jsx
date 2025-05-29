@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { deleteContratacion } from "@/service/ContratacioneService";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
-import { confirmDialog, ConfirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog } from 'primereact/confirmdialog';
 import { motion } from "framer-motion";
 
 export default function ContratacionCard({
@@ -19,6 +19,7 @@ export default function ContratacionCard({
   estado,
   onDelete,
   canDelete,
+  showConfirmDialog // <-- Añade esta prop
 }) {
   const router = useRouter();
 
@@ -28,30 +29,27 @@ export default function ContratacionCard({
       alert("No se puede eliminar esta contratación porque el ID no es válido.");
       return;
     }
-
-    confirmDialog({
-      message: '¿Estás seguro de que quieres eliminar esta contratación? Esta acción no se puede deshacer.',
-      header: 'Confirmación de Eliminación',
-      icon: 'pi pi-exclamation-triangle',
-      acceptClassName: 'p-button-danger',
-      acceptLabel: 'Sí, eliminar',
-      rejectLabel: 'No, cancelar',
-      accept: async () => {
-        try {
-          const success = await deleteContratacion(id);
-          if (success) {
-            alert("Contratación eliminada exitosamente.");
-            onDelete(id); 
+    if (showConfirmDialog) {
+      showConfirmDialog({
+        message: '¿Estás seguro de que quieres eliminar esta contratación? Esta acción no se puede deshacer.',
+        header: 'Confirmación de Eliminación',
+        icon: 'pi pi-exclamation-triangle',
+        acceptClassName: 'p-button-danger',
+        acceptLabel: 'Sí, eliminar',
+        rejectLabel: 'No, cancelar',
+        accept: async () => {
+          try {
+            const success = await deleteContratacion(id);
+            if (success) {
+              alert("Contratación eliminada exitosamente.");
+              onDelete(id);
+            }
+          } catch (error) {
+            alert("Error al eliminar contratación: " + (error.message || "Por favor, inténtalo de nuevo."));
           }
-        } catch (error) {
-          console.error("Error al eliminar contratación:", error);
-          alert("Error al eliminar contratación: " + (error.message || "Por favor, inténtalo de nuevo."));
-        }
-      },
-      reject: () => {
-        // El usuario canceló
-      }
-    });
+        },
+      });
+    }
   };
 
   const formatCurrency = (value) => {
@@ -74,8 +72,6 @@ export default function ContratacionCard({
       transition={{ duration: 0.5 }}
       className="relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100 group"
     >
-      <ConfirmDialog />
-
       <div className="p-6 md:p-8 flex flex-col gap-5">
         <h3 className="text-2xl md:text-3xl font-extrabold text-indigo-800 leading-tight">
           {nombreEmpleado || "Empleado Desconocido"}
