@@ -27,13 +27,13 @@ const ListadoContrataciones = () => {
   try {
     const token = localStorage.getItem("token");
     if (token) {
-      const decoded = jwtDecode(token); // Usa jwtDecode (named export)
+      const decoded = jwtDecode(token);
       const roles = decoded?.roles || [];
       isAdmin = Array.isArray(roles)
         ? roles.includes("ROLE_ADMIN")
         : roles === "ROLE_ADMIN";
     }
-  } catch (e) {
+  } catch {
     isAdmin = false;
   }
 
@@ -54,7 +54,6 @@ const ListadoContrataciones = () => {
           getCargos(),
           getTiposContratacion(),
         ]);
-
         setContrataciones(contratacionesData);
         setDepartamentos(departamentosData);
         setEmpleados(empleadosData);
@@ -70,7 +69,7 @@ const ListadoContrataciones = () => {
     fetchAll();
   }, []);
 
-  // Crear mapas de lookup para nombres
+  // Maps para lookup
   const departamentoMap = Object.fromEntries(
     departamentos.map((d) => [d.idDepartamento, d.nombreDepartamento])
   );
@@ -84,13 +83,15 @@ const ListadoContrataciones = () => {
     tiposContratacion.map((t) => [t.idTipoContratacion, t.tipoContratacion])
   );
 
-  const handleDelete = (idEliminado) => {
-    setContrataciones((prev) => prev.filter((c) => c.idContratacion !== idEliminado));
+  const handleDelete = (id) => {
+    setContrataciones((prev) =>
+      prev.filter((c) => c.idContratacion !== id)
+    );
   };
 
   if (isLoading) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div className="flex flex-col min-h-screen">
         <Header />
         <div className="container my-5">
           <h2>Cargando contrataciones...</h2>
@@ -102,7 +103,7 @@ const ListadoContrataciones = () => {
 
   if (error) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <div className="flex flex-col min-h-screen">
         <Header />
         <div className="container my-5">
           <h2>Error: {error}</h2>
@@ -113,15 +114,28 @@ const ListadoContrataciones = () => {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="container my-5">
-        <h2 className="text-2xl font-bold text-indigo-700 mb-6">Listado de Contrataciones</h2>
-        <div className="flex flex-wrap gap-6 justify-center">
+        <h2 className="text-2xl font-bold text-indigo-700 mb-6">
+          Listado de Contrataciones
+        </h2>
+
+        {/* Grid auto-fit: cada card ocupa mínimo 300px y máximo 1fr */}
+        <div
+          className="grid gap-8"
+          style={{
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(300px, 1fr))",
+          }}
+        >
           {contrataciones.length > 0 ? (
             contrataciones.map((c) => (
               <ContratacionCard
-                key={c.idContratacion || `${c.idDepartamento}-${c.idEmpleado}-${c.idCargo}-${c.idTipoContratacion}-${c.fechaContratacion}`}
+                key={
+                  c.idContratacion ||
+                  `${c.idDepartamento}-${c.idEmpleado}-${c.idCargo}-${c.idTipoContratacion}-${c.fechaContratacion}`
+                }
                 id={c.idContratacion}
                 nombreDepartamento={departamentoMap[c.idDepartamento]}
                 nombreEmpleado={empleadoMap[c.idEmpleado]}
@@ -132,11 +146,11 @@ const ListadoContrataciones = () => {
                 estado={c.estado}
                 onDelete={handleDelete}
                 canDelete={isAdmin}
-                cardClassName="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 min-w-[260px] max-w-xs flex flex-col items-center"
+                cardClassName="w-full bg-white rounded-2xl shadow-lg border border-gray-200 p-6 flex flex-col"
               >
-                <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "10px" }}>
+                <div className="flex flex-wrap justify-center gap-3 mt-4">
                   <button
-                    style={{ background: "#7c6cf7", color: "#fff", border: "none", borderRadius: "20px", padding: "8px 20px", cursor: "pointer" }}
+                    className="bg-purple-600 text-white rounded-full px-4 py-2 hover:bg-purple-700 transition"
                     onClick={() =>
                       router.push(
                         `/dashboard/editar-contratacion/${c.idContratacion}`
@@ -146,7 +160,7 @@ const ListadoContrataciones = () => {
                     Editar
                   </button>
                   <button
-                    style={{ background: "#4f46e5", color: "#fff", border: "none", borderRadius: "20px", padding: "8px 20px", cursor: "pointer" }}
+                    className="bg-indigo-600 text-white rounded-full px-4 py-2 hover:bg-indigo-700 transition"
                     onClick={() =>
                       router.push(
                         `/dashboard/ver-contratacion/${c.idContratacion}`
@@ -157,7 +171,7 @@ const ListadoContrataciones = () => {
                   </button>
                   {isAdmin && (
                     <button
-                      style={{ background: "#e74c3c", color: "#fff", border: "none", borderRadius: "20px", padding: "8px 20px", cursor: "pointer" }}
+                      className="bg-red-600 text-white rounded-full px-4 py-2 hover:bg-red-700 transition"
                       onClick={() => handleDelete(c.idContratacion)}
                     >
                       Eliminar
