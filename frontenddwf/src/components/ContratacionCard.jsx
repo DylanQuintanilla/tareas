@@ -13,6 +13,7 @@ export default function ContratacionCard({
   salario,
   estado,
   onDelete,
+  canDelete, // <-- Recibe canDelete (isAdmin)
 }) {
   const router = useRouter();
 
@@ -50,8 +51,11 @@ export default function ContratacionCard({
         <button onClick={() => router.push(`/dashboard/editar-contratacion/${id}`)}>
           Editar
         </button>
-        {onDelete && (
-          <button onClick={() => onDelete(id)}>
+        <button onClick={() => router.push(`/dashboard/ver-contratacion/${id}`)}>
+          Ver
+        </button>
+        {canDelete && (
+          <button onClick={handleDelete}>
             Eliminar
           </button>
         )}

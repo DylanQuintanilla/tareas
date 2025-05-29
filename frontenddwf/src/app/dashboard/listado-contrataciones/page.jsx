@@ -10,7 +10,7 @@ import { getCargos } from "@/service/CargosServices";
 import { getTiposContratacion } from "@/service/TipoContratacion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/AuthContext";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const ListadoContrataciones = () => {
   const [contrataciones, setContrataciones] = useState([]);
@@ -27,7 +27,7 @@ const ListadoContrataciones = () => {
   try {
     const token = localStorage.getItem("token");
     if (token) {
-      const decoded = jwtDecode(token);
+      const decoded = jwtDecode(token); // Usa jwtDecode (named export)
       const roles = decoded?.roles || [];
       isAdmin = Array.isArray(roles)
         ? roles.includes("ROLE_ADMIN")
@@ -144,6 +144,24 @@ const ListadoContrataciones = () => {
                   >
                     Editar
                   </button>
+                  <button
+                    style={{ background: "#4f46e5", color: "#fff", border: "none", borderRadius: "20px", padding: "8px 20px", cursor: "pointer" }}
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/ver-contratacion/${c.idContratacion}`
+                      )
+                    }
+                  >
+                    Ver
+                  </button>
+                  {isAdmin && (
+                    <button
+                      style={{ background: "#e74c3c", color: "#fff", border: "none", borderRadius: "20px", padding: "8px 20px", cursor: "pointer" }}
+                      onClick={() => handleDelete(c.idContratacion)}
+                    >
+                      Eliminar
+                    </button>
+                  )}
                 </div>
               </ContratacionCard>
             ))

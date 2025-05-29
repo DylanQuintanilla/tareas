@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import EmpleadoCard from "@/components/EmpleadoCard";
 import { getEmpleados } from "@/service/EmpleadoService";
 import { useAuth } from "@/app/Context/AuthContext";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const ListadoEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
@@ -17,7 +17,7 @@ const ListadoEmpleados = () => {
   try {
     const token = localStorage.getItem("token");
     if (token) {
-      const decoded = jwtDecode(token);
+      const decoded = jwtDecode(token); // Usa jwtDecode (named export)
       const roles = decoded?.roles || [];
       isAdmin = Array.isArray(roles)
         ? roles.includes("ROLE_ADMIN")

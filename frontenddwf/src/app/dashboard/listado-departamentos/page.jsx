@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { getDepartamentos, deleteDepartamento } from "@/service/DepartamentoService";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/AuthContext";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const ListadoDepartamentos = () => {
   const [departamentos, setDepartamentos] = useState([]);
@@ -18,7 +18,7 @@ const ListadoDepartamentos = () => {
   try {
     const token = localStorage.getItem("token");
     if (token) {
-      const decoded = jwtDecode(token);
+      const decoded = jwtDecode(token); // Usa jwtDecode (named export)
       const roles = decoded?.roles || [];
       isAdmin = Array.isArray(roles)
         ? roles.includes("ROLE_ADMIN")
