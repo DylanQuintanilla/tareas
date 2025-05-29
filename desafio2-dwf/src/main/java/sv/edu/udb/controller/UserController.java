@@ -16,7 +16,7 @@ public class UserController {
     private final UserRepository userRepository;
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<User> users = userRepository.findAll();
         List<UserDto> userDtos = users.stream()
@@ -25,7 +25,7 @@ public class UserController {
         return ResponseEntity.ok(userDtos);
     }
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public User getUserById(@PathVariable Integer id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));

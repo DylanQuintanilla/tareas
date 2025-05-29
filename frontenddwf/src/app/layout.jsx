@@ -27,6 +27,10 @@ function ProtectedRoot({ children }) {
 export default function RootLayout({ children }) {
   return (
     <html lang="es">
+      <head>
+        {/* CDN de Tailwind CSS Browser para soporte CDN */}
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+      </head>
       <body>
         <AuthProvider>
           <ProtectedRoot>
