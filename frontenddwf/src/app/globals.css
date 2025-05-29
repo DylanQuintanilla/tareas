@@ -2,22 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Puedes agregar aquí tus estilos globales personalizados si lo deseas */
 
+@import "primereact/resources/themes/lara-light-indigo/theme.css"; /* O el tema que uses */
+@import "primereact/resources/primereact.min.css";
+@import "primeicons/primeicons.css";
+/*
+  Variables CSS (personalizadas que Tailwind no gestiona directamente)
+  Usa estas variables en tus componentes con Tailwind o estilos inline si es necesario.
+*/
 :root {
   --primary-color: #6A5ACD; /* Purple-blue primary color */
-  --secondary-color: #ffffff; /* Blanco (usado para fondos claros o texto sobre fondos oscuros) */
+  --secondary-color: #ffffff;
   --background-color: #f3f4f6; /* Neutral light background */
-  --text-color: #333333; /* Color de texto base, un gris oscuro */
+  --text-color: #333333;
   --heading-color: #4A4A8A; /* Darker purple for headings */
   --input-background: #f9f9fc; /* Light background for inputs */
   --input-text-color: #333333; /* Dark text for inputs */
   --border-radius: 16px; /* Smooth corners */
   --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Softer shadow */
   --gradient: linear-gradient(135deg, #6A5ACD, #836FFF); /* Purple gradient */
-  --transition: all 0.3s ease-in-out;
-  --background: #ffffff; /* Fondo principal claro */
-  --foreground: #171717; /* Color de texto casi negro (foreground) */
+  --transition: all 0.3s ease-in-out; /* Transiciones CSS genéricas */
+  --background: #ffffff; /* Fondo principal claro para el modo claro */
+  --foreground: #171717; /* Color de texto principal casi negro para el modo claro */
+  --input-border-color: #ccc; /* Agregado para el select y general */
+
+  /* NUEVA VARIABLE: Altura del header */
+  --header-height: 10.5rem; /* Ajusta esto si cambias el padding-y del header */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -33,25 +43,46 @@
   }
 }
 
-
+/* Estilos base para el HTML/Body que no deben ser manejados por Tailwind para evitar conflictos */
 html,
 body {
-  height: 100%; /* Ensure the body spans the full height of the viewport */
+  height: 100%;
   max-width: 100vw;
   overflow-x: hidden;
+  font-family: 'Roboto', Arial, sans-serif; /* Asegúrate de importar 'Roboto' si lo usas */
+  font-size: 1.1rem;
+  line-height: 1.8;
 }
 
 body {
   display: flex;
-  flex-direction: column; /* Arrange content vertically */
-  background: var(--background-color);
-  color: var(--foreground); /* CAMBIO: Usa --foreground (casi negro) para el texto base del body */
+  flex-direction: column;
+  background-color: var(--background-color);
+  color: var(--foreground);
   margin: 0;
   padding: 0;
-  line-height: 1.8; /* Slightly increase line height for better readability */
-  font-family: 'Roboto', Arial, sans-serif;
-  font-size: 1.1rem; /* Increase base font size */
-  height: 100%; /* Ensure the body spans the full height of the viewport */
+  min-height: 100vh; /* Asegura que el body ocupe toda la altura de la ventana */
+  /* CLAVE: Añadir padding-top al body para compensar el header fijo */
+  padding-top: var(--header-height); /* Esto empuja el contenido hacia abajo */
+}
+
+/* Reglas universales: Mantén esto. */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* Animación para el fadeIn */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 main {
@@ -194,6 +225,7 @@ button:hover {
 .button-group {
   text-align: center;
 }
+
 
 .card-container {
   display: flex;
