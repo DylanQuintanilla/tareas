@@ -69,7 +69,6 @@ const ListadoContrataciones = () => {
     fetchAll();
   }, []);
 
-  // Maps para lookup
   const departamentoMap = Object.fromEntries(
     departamentos.map((d) => [d.idDepartamento, d.nombreDepartamento])
   );
@@ -121,14 +120,7 @@ const ListadoContrataciones = () => {
           Listado de Contrataciones
         </h2>
 
-        {/* Grid auto-fit: cada card ocupa mínimo 300px y máximo 1fr */}
-        <div
-          className="grid gap-8"
-          style={{
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(300px, 1fr))",
-          }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {contrataciones.length > 0 ? (
             contrataciones.map((c) => (
               <ContratacionCard
