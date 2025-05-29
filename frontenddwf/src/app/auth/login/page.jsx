@@ -11,8 +11,13 @@ const Login = () => {
   const { user } = useAuth();
 
   // Redirige si ya está logueado
+  useEffect(() => {
+    if (user) {
+      router.replace("/dashboard");
+    }
+  }, [user, router]);
+
   if (user) {
-    router.replace("/dashboard");
     return null;
   }
 

@@ -1,27 +1,22 @@
 package sv.edu.udb.domain;
 
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 @Data
 @Entity
-@Table(name = "user")
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "users")
 public class User implements UserDetails {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idUser;
 
     @Column(unique = true, nullable = false)
@@ -34,39 +29,48 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    // Implementación completa de UserDetails
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Set<Role> roles = new HashSet<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+        List<GrantedAuthority> auths = new ArrayList<>();
+        for (Role role : roles) {
+            auths.add(new SimpleGrantedAuthority(role.name()));
+        }
+        return auths;
     }
 
     @Override
     public String getPassword() {
-        return this.password; // Retorna el campo password
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return this.username; // Retorna el campo username
+        return this.username;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // Cuenta nunca expira
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // Cuenta nunca se bloquea
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // Credenciales nunca expiran
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // Cuenta siempre activa
+        return true;
     }
 }
