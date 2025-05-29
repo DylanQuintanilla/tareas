@@ -116,8 +116,8 @@ const ListadoContrataciones = () => {
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Header />
       <main className="container my-5">
-        <h2>Listado de Contrataciones</h2>
-        <div className="card-container">
+        <h2 className="text-2xl font-bold text-indigo-700 mb-6">Listado de Contrataciones</h2>
+        <div className="flex flex-wrap gap-6 justify-center">
           {contrataciones.length > 0 ? (
             contrataciones.map((c) => (
               <ContratacionCard
@@ -132,6 +132,7 @@ const ListadoContrataciones = () => {
                 estado={c.estado}
                 onDelete={handleDelete}
                 canDelete={isAdmin}
+                cardClassName="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 min-w-[260px] max-w-xs flex flex-col items-center"
               >
                 <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "10px" }}>
                   <button
