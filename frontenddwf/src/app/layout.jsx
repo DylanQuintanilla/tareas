@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/app/Context/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
+import './globals.css';
 
 // Este componente envuelve la protección de rutas para la raíz
 function ProtectedRoot({ children }) {

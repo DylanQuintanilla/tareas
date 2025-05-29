@@ -50,9 +50,11 @@ export default function ContratacionCard({
         <button onClick={() => router.push(`/dashboard/editar-contratacion/${id}`)}>
           Editar
         </button>
-        <button onClick={handleDelete}>
-          Eliminar
-        </button>
+        {onDelete && (
+          <button onClick={() => onDelete(id)}>
+            Eliminar
+          </button>
+        )}
       </div>
     </div>
   );

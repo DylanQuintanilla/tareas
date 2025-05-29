@@ -4,12 +4,29 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getDepartamentos, deleteDepartamento } from "@/service/DepartamentoService";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/Context/AuthContext";
+import jwtDecode from "jwt-decode";
 
 const ListadoDepartamentos = () => {
   const [departamentos, setDepartamentos] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { user } = useAuth();
+
+  let isAdmin = false;
+  try {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      const roles = decoded?.roles || [];
+      isAdmin = Array.isArray(roles)
+        ? roles.includes("ROLE_ADMIN")
+        : roles === "ROLE_ADMIN";
+    }
+  } catch (e) {
+    isAdmin = false;
+  }
 
   useEffect(() => {
     const fetchDepartamentos = async () => {
@@ -62,9 +79,11 @@ const ListadoDepartamentos = () => {
                   <button onClick={() => router.push(`/dashboard/editar-departamento/${dep.idDepartamento || dep.id}`)}>
                     Editar
                   </button>
-                  <button onClick={() => handleDelete(dep.idDepartamento || dep.id)}>
-                    Eliminar
-                  </button>
+                  {isAdmin && (
+                    <button onClick={() => handleDelete(dep.idDepartamento || dep.id)}>
+                      Eliminar
+                    </button>
+                  )}
                 </div>
               </div>
             ))

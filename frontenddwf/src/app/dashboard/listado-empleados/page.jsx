@@ -3,12 +3,29 @@ import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EmpleadoCard from "@/components/EmpleadoCard";
-import { getEmpleados } from "@/service/EmpleadoService"; // Use getEmpleados consistently
+import { getEmpleados } from "@/service/EmpleadoService";
+import { useAuth } from "@/app/Context/AuthContext";
+import jwtDecode from "jwt-decode";
 
 const ListadoEmpleados = () => {
   const [empleados, setEmpleados] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth(); // <-- Agregado
+
+  let isAdmin = false;
+  try {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      const roles = decoded?.roles || [];
+      isAdmin = Array.isArray(roles)
+        ? roles.includes("ROLE_ADMIN")
+        : roles === "ROLE_ADMIN";
+    }
+  } catch (e) {
+    isAdmin = false;
+  }
 
   useEffect(() => {
     const fetchEmpleados = async () => {
@@ -72,9 +89,10 @@ const ListadoEmpleados = () => {
                 key={empleado.idEmpleado || empleado.id}
                 empleado={{
                   ...empleado,
-                  id: empleado.id || empleado.idEmpleado // asegura que siempre haya un id
+                  id: empleado.id || empleado.idEmpleado
                 }}
                 onDelete={handleDelete}
+                canDelete={isAdmin}
               />
             ))
           ) : (

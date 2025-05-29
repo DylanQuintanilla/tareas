@@ -3,7 +3,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { deleteEmpleado } from "@/service/EmpleadoService";
 
-export default function EmpleadoCard({ empleado, onDelete }) {
+export default function EmpleadoCard({ empleado, onDelete, canDelete }) {
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -38,9 +38,11 @@ export default function EmpleadoCard({ empleado, onDelete }) {
       <div className="button-group">
         <button onClick={() => router.push(`/dashboard/ver-empleado/${empleado.id || empleado.idEmpleado}`)}>Ver</button>
         <button onClick={() => router.push(`/dashboard/editar-empleado/${empleado.id || empleado.idEmpleado}`)}>Editar</button>
-        <button onClick={handleDelete}>
-          Eliminar
-        </button>
+        {canDelete && (
+          <button onClick={() => onDelete(empleado.id)}>
+            Eliminar
+          </button>
+        )}
       </div>
     </div>
   );

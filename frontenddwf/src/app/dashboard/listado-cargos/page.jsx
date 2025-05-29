@@ -4,12 +4,30 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getCargos, deleteCargo } from "@/service/CargosServices";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/Context/AuthContext";
+import jwtDecode from "jwt-decode";
 
 const ListadoCargos = () => {
   const [cargos, setCargos] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { user } = useAuth();
+
+  // Decodifica el token para saber si es admin
+  let isAdmin = false;
+  try {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      const roles = decoded?.roles || [];
+      isAdmin = Array.isArray(roles)
+        ? roles.includes("ROLE_ADMIN")
+        : roles === "ROLE_ADMIN";
+    }
+  } catch (e) {
+    isAdmin = false;
+  }
 
   useEffect(() => {
     const fetchCargos = async () => {
@@ -63,9 +81,11 @@ const ListadoCargos = () => {
                   <button onClick={() => router.push(`/dashboard/editar-cargo/${cargo.idCargo || cargo.id}`)}>
                     Editar
                   </button>
-                  <button onClick={() => handleDelete(cargo.idCargo || cargo.id)}>
-                    Eliminar
-                  </button>
+                  {isAdmin && (
+                    <button onClick={() => handleDelete(cargo.idCargo || cargo.id)}>
+                      Eliminar
+                    </button>
+                  )}
                 </div>
               </div>
             ))

@@ -9,6 +9,8 @@ import { getEmpleados } from "@/service/EmpleadoService";
 import { getCargos } from "@/service/CargosServices";
 import { getTiposContratacion } from "@/service/TipoContratacion";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/Context/AuthContext";
+import jwtDecode from "jwt-decode";
 
 const ListadoContrataciones = () => {
   const [contrataciones, setContrataciones] = useState([]);
@@ -19,6 +21,21 @@ const ListadoContrataciones = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { user } = useAuth();
+
+  let isAdmin = false;
+  try {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      const roles = decoded?.roles || [];
+      isAdmin = Array.isArray(roles)
+        ? roles.includes("ROLE_ADMIN")
+        : roles === "ROLE_ADMIN";
+    }
+  } catch (e) {
+    isAdmin = false;
+  }
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -114,8 +131,8 @@ const ListadoContrataciones = () => {
                 salario={c.salario}
                 estado={c.estado}
                 onDelete={handleDelete}
+                canDelete={isAdmin}
               >
-                {/* Botón Editar agregado aquí */}
                 <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginTop: "10px" }}>
                   <button
                     style={{ background: "#7c6cf7", color: "#fff", border: "none", borderRadius: "20px", padding: "8px 20px", cursor: "pointer" }}
@@ -127,8 +144,6 @@ const ListadoContrataciones = () => {
                   >
                     Editar
                   </button>
-                  {/* Si quieres el botón Eliminar aquí también, descomenta la siguiente línea: */}
-                  {/* <button onClick={() => handleDelete(c.idContratacion)}>Eliminar</button> */}
                 </div>
               </ContratacionCard>
             ))

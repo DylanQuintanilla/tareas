@@ -4,12 +4,29 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getTiposContratacion, deleteTipoContratacion } from "@/service/TipoContratacion";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/Context/AuthContext";
+import jwtDecode from "jwt-decode";
 
 const ListadoTiposContratacion = () => {
   const [tipos, setTipos] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { user } = useAuth();
+
+  let isAdmin = false;
+  try {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decoded = jwtDecode(token);
+      const roles = decoded?.roles || [];
+      isAdmin = Array.isArray(roles)
+        ? roles.includes("ROLE_ADMIN")
+        : roles === "ROLE_ADMIN";
+    }
+  } catch (e) {
+    isAdmin = false;
+  }
 
   useEffect(() => {
     const fetchTipos = async () => {
@@ -61,9 +78,11 @@ const ListadoTiposContratacion = () => {
                   <button onClick={() => router.push(`/dashboard/editar-tipo-contratacion/${tipo.idTipoContratacion || tipo.id}`)}>
                     Editar
                   </button>
-                  <button onClick={() => handleDelete(tipo.idTipoContratacion || tipo.id)}>
-                    Eliminar
-                  </button>
+                  {isAdmin && (
+                    <button onClick={() => handleDelete(tipo.idTipoContratacion || tipo.id)}>
+                      Eliminar
+                    </button>
+                  )}
                 </div>
               </div>
             ))

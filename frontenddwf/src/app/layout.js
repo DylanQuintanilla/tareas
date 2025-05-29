@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "./globals.css"; // Asegúrate de que esta línea esté presente y correcta
 import { Provider } from "react-redux";
 import { store } from "@/store/store";
 import ProtectedRoot from "./protected-root"; // componente separado
