@@ -2,6 +2,7 @@ package sv.edu.udb.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import sv.edu.udb.controller.request.TipoContratacionRequest;
 import sv.edu.udb.controller.response.TipoContratacionResponse;
@@ -39,6 +40,7 @@ public class TipoContratacionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(NO_CONTENT)
     public void deleteTipoContratacion(@PathVariable Long id) {
         tipoContratacionService.deleteTipoContratacion(id);
