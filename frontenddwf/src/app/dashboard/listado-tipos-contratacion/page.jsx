@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TipoContratacionCard from "@/components/TipoContratacionCard";
 import { getTiposContratacion, deleteTipoContratacion } from "@/service/TipoContratacion";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/Context/AuthContext";
 import { jwtDecode } from "jwt-decode";
 
@@ -11,20 +11,19 @@ const ListadoTiposContratacion = () => {
   const [tipos, setTipos] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const { user } = useAuth();
 
   let isAdmin = false;
   try {
     const token = localStorage.getItem("token");
     if (token) {
-      const decoded = jwtDecode(token); // Usa jwtDecode (named export)
+      const decoded = jwtDecode(token);
       const roles = decoded?.roles || [];
       isAdmin = Array.isArray(roles)
         ? roles.includes("ROLE_ADMIN")
         : roles === "ROLE_ADMIN";
     }
-  } catch (e) {
+  } catch {
     isAdmin = false;
   }
 
@@ -44,62 +43,64 @@ const ListadoTiposContratacion = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!id) return;
-    if (confirm("¿Estás seguro de eliminar este tipo de contratación?")) {
-      try {
-        const ok = await deleteTipoContratacion(id);
-        if (ok) {
-          setTipos((prev) => prev.filter((t) => (t.id || t.idTipoContratacion) !== id));
-          alert("Tipo de contratación eliminado exitosamente.");
-        } else {
-          alert("Error al eliminar tipo de contratación.");
-        }
-      } catch (err) {
+    try {
+      const ok = await deleteTipoContratacion(id);
+      if (ok) {
+        setTipos((prev) => prev.filter((t) => (t.id || t.idTipoContratacion) !== id));
+      } else {
         alert("Error al eliminar tipo de contratación.");
       }
+    } catch {
+      alert("Error al eliminar tipo de contratación.");
     }
   };
 
+  // Carga inicial
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <div className="container my-5">
+          <h2>Cargando tipos de contratación...</h2>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Error
+  if (error) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <div className="container my-5">
+          <h2>Error: {error}</h2>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Renderizado final
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <div className="flex flex-col min-h-screen">
       <Header />
       <main className="container my-5">
-        <h2 className="text-2xl font-bold text-indigo-700 mb-6">Listado de Tipos de Contratación</h2>
-        <div className="flex flex-wrap gap-6 justify-center">
+        <h2 className="text-2xl font-bold text-indigo-700 mb-6">
+          Listado de Tipos de Contratación
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {tipos.length > 0 ? (
             tipos.map((tipo) => (
-              <div
-                className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 min-w-[260px] max-w-xs flex flex-col items-center"
+              <TipoContratacionCard
                 key={tipo.idTipoContratacion || tipo.id}
-              >
-                <h3 className="text-lg font-bold text-indigo-700 mb-2">{tipo.tipoContratacion}</h3>
-                <p className="text-gray-800"><strong>ID:</strong> {tipo.idTipoContratacion || tipo.id}</p>
-                <div className="flex gap-3 mt-4">
-                  <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-full px-5 py-2 font-semibold transition"
-                    onClick={() => router.push(`/dashboard/ver-tipo-contratacion/${tipo.idTipoContratacion || tipo.id}`)}
-                  >
-                    Ver
-                  </button>
-                  <button
-                    className="bg-indigo-500 hover:bg-indigo-600 text-white rounded-full px-5 py-2 font-semibold transition"
-                    onClick={() => router.push(`/dashboard/editar-tipo-contratacion/${tipo.idTipoContratacion || tipo.id}`)}
-                  >
-                    Editar
-                  </button>
-                  {isAdmin && (
-                    <button
-                      className="bg-red-500 hover:bg-red-600 text-white rounded-full px-5 py-2 font-semibold transition"
-                      onClick={() => handleDelete(tipo.idTipoContratacion || tipo.id)}
-                    >
-                      Eliminar
-                    </button>
-                  )}
-                </div>
-              </div>
+                tipo={tipo}
+                onDelete={handleDelete}
+                canDelete={isAdmin}
+              />
             ))
           ) : (
-            <p>No hay tipos de contratación registrados.</p>
+            <p>No hay tipos registrados.</p>
           )}
         </div>
       </main>
