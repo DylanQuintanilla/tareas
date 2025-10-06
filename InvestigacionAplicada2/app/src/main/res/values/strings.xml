@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">InvestigacionAplicada2</string>
+    <string name="title_artistas">Artistas</string>
+    <string name="title_albumes">Álbumes</string>
+    <string name="title_canciones">Canciones</string>
+    <string name="search_hint_artistas">Buscar artista...</string>
+    <string name="search_hint_albumes">Buscar álbum...</string>
+    <string name="search_hint_canciones">Buscar canción...</string>
+</resources>

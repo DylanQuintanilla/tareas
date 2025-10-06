@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/artistasFragment"
+        android:icon="@drawable/ic_artist"
+        android:title="Artistas"
+        app:launchSingleTop="true"
+        app:restoreState="true"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToSaveState="true"
+        />
+
+    <item
+        android:id="@+id/albumesFragment"
+        android:icon="@drawable/ic_album"
+        android:title="Álbumes"
+        app:launchSingleTop="true"
+        app:restoreState="true"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToSaveState="true"
+        />
+
+    <item
+        android:id="@+id/cancionesFragment"
+        android:icon="@drawable/ic_song"
+        android:title="Canciones"
+        app:launchSingleTop="true"
+        app:restoreState="true"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToSaveState="true"
+        />
+
+</menu>

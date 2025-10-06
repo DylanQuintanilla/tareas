@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/artistasFragment">
+
+    <fragment
+        android:id="@+id/artistasFragment"
+        android:name="com.example.investigacionaplicada2.ui.ArtistasFragment"
+        android:label="Artistas"
+        tools:layout="@layout/fragment_artistas" />
+
+    <!-- AÑADE ESTOS DOS BLOQUES -->
+    <fragment
+        android:id="@+id/albumesFragment"
+        android:name="com.example.investigacionaplicada2.ui.AlbumesFragment"
+        android:label="Álbumes"
+        tools:layout="@layout/fragment_albumes" />
+
+    <fragment
+        android:id="@+id/cancionesFragment"
+        android:name="com.example.investigacionaplicada2.ui.CancionesFragment"
+        android:label="Canciones"
+        tools:layout="@layout/fragment_canciones" />
+
+</navigation>
